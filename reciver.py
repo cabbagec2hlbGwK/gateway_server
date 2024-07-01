@@ -1,4 +1,5 @@
 import os
+import argparse
 import ssl
 import subprocess
 from aiosmtpd.smtp import SMTP
@@ -33,11 +34,16 @@ class ControllerStarttls(Controller):
     def factory(self):
         return SMTP(self.handler, require_starttls=True, tls_context=context)
 
-# Start server
-controller = ControllerStarttls(ExampleHandler(), port=1025,  hostname="172.17.85.233")
-controller.start()
-# Test using swaks (if available)
-subprocess.call('swaks -tls -f test@test.com -t test@test.com --server 172.17.85.233:1025', shell=True)
-input('Running STARTTLS server. Press enter to stop.\n')
-controller.stop()
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
+    parser.add_argument("--ip", required=True)
+    parser.add_argument("--port", required=True) 
+    args = parser.parse_args()
+
+    controller = ControllerStarttls(ExampleHandler(), port=args.port,  hostname=args.ip)
+    controller.start()
+    subprocess.call('swaks -tls -f test@test.com -t test@test.com --server 172.17.85.233:1025', shell=True)
+    input('Running STARTTLS server. Press enter to stop.\n')
+    controller.stop()
+    

@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     controller = ControllerStarttls(ExampleHandler(), port=args.port,  hostname=args.ip)
     controller.start()
-    subprocess.call('swaks -tls -f test@test.com -t test@test.com --server 172.17.85.233:1025', shell=True)
+    subprocess.call(f'swaks -tls -f test@test.com -t test@test.com --server {args.ip}:{args.port}', shell=True)
     input('Running STARTTLS server. Press enter to stop.\n')
     controller.stop()
     

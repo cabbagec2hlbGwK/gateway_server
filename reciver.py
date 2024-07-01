@@ -7,10 +7,23 @@ from aiosmtpd.controller import Controller
 from aiosmtpd.handlers import Debugging
 
 
+#------------Section for setingup cert and args--------------------------------
+parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
+parser.add_argument("--ip", required=True)
+parser.add_argument("--port", required=True) 
+args = parser.parse_args()
+
+# Create cert and key if they don't exist
+if not os.path.exists(f'cert/{os.path.sep}cert.pem') and not os.path.exists(f'cert{os.path.sep}key.pem'):
+    subprocess.call(f'openssl req -x509 -newkey rsa:4096 -keyout cert{os.path.sep}key.pem -out cert{os.path.sep}cert.pem ' +
+                    '-days 365 -nodes -subj "/CN={}"', shell=True)
 # Load SSL context
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 context.load_cert_chain(f'cert{os.path.sep}cert.pem', f'cert{os.path.sep}key.pem')
-class ExampleHandler:
+
+#------------------------------------------------------------------------------
+
+class MessageHandler:
     async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
         if not address.endswith('@example.com'):
             return '550 not relaying to that domain'
@@ -29,19 +42,9 @@ class ExampleHandler:
 class ControllerStarttls(Controller):
     def factory(self):
         return SMTP(self.handler, require_starttls=True, tls_context=context)
-
-
+#---------------------------------runner---------------------------------------
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
-    parser.add_argument("--ip", required=True)
-    parser.add_argument("--port", required=True) 
-    args = parser.parse_args()
-    # Create cert and key if they don't exist
-    if not os.path.exists(f'cert/{os.path.sep}cert.pem') and not os.path.exists(f'cert{os.path.sep}key.pem'):
-        subprocess.call(f'openssl req -x509 -newkey rsa:4096 -keyout cert{os.path.sep}key.pem -out cert{os.path.sep}cert.pem ' +
-                        f'-days 365 -nodes -subj "/CN={args.ip}"', shell=True)
-
-    controller = ControllerStarttls(ExampleHandler(), port=args.port,  hostname=args.ip)
+    controller = ControllerStarttls(MessageHandler(), port=args.port,  hostname=args.ip)
     controller.start()
     subprocess.call(f'swaks -tls -f test@test.com -t test@test.com --server {args.ip}:{args.port}', shell=True)
     input('Running STARTTLS server. Press enter to stop.\n')

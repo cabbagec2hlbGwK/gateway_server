@@ -5,7 +5,6 @@ import subprocess
 import smtplib
 from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
-from aiosmtpd.handlers import Debugging
 from email import message_from_bytes
 from email.policy import default
 
@@ -32,8 +31,7 @@ class MessageHandler:
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
         message = message_from_bytes(envelope.content, policy=default)
-        #HERE MAYBE WOULD BE SAFER TO WALK CONTENTS AND PARSE/MODIFY ONLY MAIL BODY, BUT NO SIDE EFFECTS UNTIL NOW WITH MIME, ATTACHMENTS...
-        messagetostring = message.as_string() ### smtplib.sendmail WANTED BYTES or STRING, NOT email OBJECT.
+        messagetostring = message.items()
         print(messagetostring)
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()
@@ -46,6 +44,9 @@ class MessageHandler:
 class ControllerStarttls(Controller):
     def factory(self):
         return SMTP(self.handler, require_starttls=True, tls_context=context)
+
+
+
 #---------------------------------runner---------------------------------------
 if __name__ == "__main__":
     controller = ControllerStarttls(MessageHandler(), port=args.port,  hostname=args.ip)

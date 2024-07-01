@@ -6,10 +6,6 @@ from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
 from aiosmtpd.handlers import Debugging
 
-# Create cert and key if they don't exist
-if not os.path.exists(f'cert/{os.path.sep}cert.pem') and not os.path.exists(f'cert{os.path.sep}key.pem'):
-    subprocess.call(f'openssl req -x509 -newkey rsa:4096 -keyout cert{os.path.sep}key.pem -out cert{os.path.sep}cert.pem ' +
-                    '-days 365 -nodes -subj "/CN=172.17.85.233"', shell=True)
 
 # Load SSL context
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -40,6 +36,10 @@ if __name__ == "__main__":
     parser.add_argument("--ip", required=True)
     parser.add_argument("--port", required=True) 
     args = parser.parse_args()
+    # Create cert and key if they don't exist
+    if not os.path.exists(f'cert/{os.path.sep}cert.pem') and not os.path.exists(f'cert{os.path.sep}key.pem'):
+        subprocess.call(f'openssl req -x509 -newkey rsa:4096 -keyout cert{os.path.sep}key.pem -out cert{os.path.sep}cert.pem ' +
+                        f'-days 365 -nodes -subj "/CN={args.ip}"', shell=True)
 
     controller = ControllerStarttls(ExampleHandler(), port=args.port,  hostname=args.ip)
     controller.start()

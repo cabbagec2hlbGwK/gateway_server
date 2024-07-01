@@ -34,7 +34,7 @@ class MessageHandler:
         message = message_from_bytes(envelope.content, policy=default)
         body = message.get_payload()
         emailMess = None
-        attachments = None
+        attachments = list()
         if not isinstance(body, str) and len(body)>1:
             emailMess = body[0]
             attachments = body[1:]

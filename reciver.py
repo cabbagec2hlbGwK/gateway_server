@@ -35,7 +35,9 @@ class MessageHandler:
         #HERE MAYBE WOULD BE SAFER TO WALK CONTENTS AND PARSE/MODIFY ONLY MAIL BODY, BUT NO SIDE EFFECTS UNTIL NOW WITH MIME, ATTACHMENTS...
         messagetostring = message.as_string() ### smtplib.sendmail WANTED BYTES or STRING, NOT email OBJECT.
         print(messagetostring)
-        with smtplib.SMTP(host='smtp.gmail.com', port=465) as smtp:
+        with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
             smtp.send_message(message, mailfrom, rcpttos)
             smtp.quit()
         return '250 OK' ### ADDED RETURN

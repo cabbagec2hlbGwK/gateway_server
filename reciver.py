@@ -1,3 +1,4 @@
+from email.message import EmailMessage
 import os
 import argparse
 import ssl
@@ -31,8 +32,16 @@ class MessageHandler:
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
         message = message_from_bytes(envelope.content, policy=default)
-        messagetostring = message.items()
-        print(messagetostring)
+        body = message.get_payload()
+        emailMess = None
+        attachments = None
+        if not isinstance(body, str) and len(body)>1:
+            emailMess = body[0]
+            attachments = body[1:]
+        else:
+            emailMess = body
+        print(f"Message{emailMess}, Attachments:{len(attachments)}")
+
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()
             smtp.starttls()

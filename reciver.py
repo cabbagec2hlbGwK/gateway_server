@@ -40,7 +40,7 @@ class MessageHandler:
             attachments = body[1:]
         else:
             emailMess = body
-        print(f"Message{emailMess}, Attachments:{len(attachments)}")
+        print(f"Message: {emailMess}, Attachments: {len(attachments)}")
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()

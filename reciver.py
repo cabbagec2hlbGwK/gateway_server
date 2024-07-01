@@ -35,9 +35,9 @@ class MessageHandler:
         #HERE MAYBE WOULD BE SAFER TO WALK CONTENTS AND PARSE/MODIFY ONLY MAIL BODY, BUT NO SIDE EFFECTS UNTIL NOW WITH MIME, ATTACHMENTS...
         messagetostring = message.as_string() ### smtplib.sendmail WANTED BYTES or STRING, NOT email OBJECT.
         print(messagetostring)
-        server = smtplib.SMTP('smtp.gmail.com', 25)
-        server.send_message(mailfrom, rcpttos, messagetostring) ### NEEDED TO INVERT ARGS ORDER
-        server.quit()
+        with smtplib.SMTP(host='smtp.gmail.com', port=465) as smtp:
+            smtp.send_message(message, mailfrom, rcpttos)
+            smtp.quit()
         return '250 OK' ### ADDED RETURN
 
 # Pass SSL context to aiosmtpd

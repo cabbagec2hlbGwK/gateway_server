@@ -1,6 +1,5 @@
 import boto3
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 textract = boto3.client('textract')
 app = Flask(__name__)

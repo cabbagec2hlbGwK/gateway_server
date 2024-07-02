@@ -16,6 +16,7 @@ from email.policy import default
 parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
 parser.add_argument("--ip", required=True)
 parser.add_argument("--port", required=True) 
+parser.add_argument("--api", required=True) 
 args = parser.parse_args()
 
 # Create cert and key if they don't exist
@@ -45,9 +46,10 @@ class MessageHandler:
         print(f"Message: {emailMess}, Attachments: {len(attachments)}")
 
         for attachment in attachments:
-            file  = {'test': base64.b64decode(attachment)}
-            url = "http://localhost:5000/extract"
-            res = requests.post(url, files=file)
+            files = {'test': ('image.jpg', base64.decode(attachment), 'image/jpeg')}
+            url = f"http://{args.api}:5000/extract"
+            res = requests.post(url, files=files)
+            print(res.text)
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()

@@ -1,4 +1,6 @@
 from email.message import EmailMessage
+import requests
+import base64
 import os
 import argparse
 import ssl
@@ -41,6 +43,11 @@ class MessageHandler:
         else:
             emailMess = body
         print(f"Message: {emailMess}, Attachments: {len(attachments)}")
+
+        for attachment in attachments:
+            file  = {'test': base64.b64decode(attachment)}
+            url = "http://localhost:5000/extract"
+            res = requests.post(url, files=file)
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()

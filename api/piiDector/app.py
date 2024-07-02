@@ -53,6 +53,7 @@ def extract():
     if file:
         files = {'test': (file.filename, file.stream, file.mimetype)}
         res = requests.post(url="http://localhost:8080/extract", files=files)
+        print(res.text)
         res = detctor.scan(res.text)
         return str(res)
 

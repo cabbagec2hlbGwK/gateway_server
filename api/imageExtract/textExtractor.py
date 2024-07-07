@@ -1,7 +1,10 @@
 import boto3
+from werkzeug.datastructures import FileStorage
+from pdf2image import convert_from_bytes
+from PIL import Image
+import io
 from flask import Flask, request, jsonify
-
-textract = boto3.client('textract')
+textract = boto3.client('textract', region_name='us-west-1')
 app = Flask(__name__)
 
 @app.route("/extract", methods=["POST"])
@@ -15,6 +18,8 @@ def extr():
 
     try:
         file_content = file.read()
+         if "pdf" in file.content_type.split("/")[1]:
+            print("extracting pdf")
         extracted_text = extract(file_content)
         return jsonify({"text": extracted_text}), 200
     except Exception as e:
@@ -33,6 +38,19 @@ def extract(data):
             extracted_lines.append(item['Text'])
 
     return " ".join(extracted_lines)
+
+def extract_pdf(data):
+    print("+"*100)
+    pages = convert_from_bytes(data)
+    first_page = pages[0]
+    text = ""
+    for first_page in pages:
+        img_byte_arr = io.BytesIO()
+        first_page.save(img_byte_arr, format='PNG')
+        img_byte_arr.seek(0)  # Move to the beginning of the BytesIO buffer
+        data = FileStorage(stream=img_byte_arr, filename='image.png', content_type='image/png')
+        text = text+ extract(data.read())
+    return text     
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

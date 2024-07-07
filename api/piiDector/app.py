@@ -1,6 +1,6 @@
 from os.path import commonpath
 from flask import Flask, request, send_file, redirect, url_for
-import requests
+import requestss
 import os, re
 import crim as CommonRegex
 
@@ -58,5 +58,5 @@ def extract():
         return str(res)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="")
 

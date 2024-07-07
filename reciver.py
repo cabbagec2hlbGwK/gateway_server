@@ -46,7 +46,10 @@ class MessageHandler:
         print(f"Message: {emailMess}, Attachments: {len(attachments)}")
 
         for attachment in attachments:
-            files = {'test': ('image.jpg', base64.decode(attachment), 'image/jpeg')}
+            metadata = attachment.get("Content-Type").split(";")
+            contentType = metadata[0].strip()
+            name = metadata[1].split("=")[1].replace('"','').strip()
+            files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
             url = f"http://{args.api}:5000/extract"
             res = requests.post(url, files=files)
             print(res.text)

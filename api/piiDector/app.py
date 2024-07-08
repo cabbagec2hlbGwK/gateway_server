@@ -18,7 +18,7 @@ class PiiDetector:
         try:
             print(text)
             response = self.model.detect_dominant_language(Text=text)
-            languages = response["Languages"]
+            languages = response['Languages'][0]['LanguageCode']
             logger.info("Detected %s languages.", len(languages))
         except ClientError:
             logger.exception("Couldn't detect languages.")
@@ -30,7 +30,7 @@ class PiiDetector:
     def detect_pii(self, text, language_code):
         try:
             response = self.model.detect_pii_entities(
-                Text=text, LanguageCode=language_code
+                Text=text, LanguageCode=str(language_code)
             )
             entities = response["Entities"]
             logger.info("Detected %s PII entities.", len(entities))
@@ -71,7 +71,7 @@ def extract():
         return str(res)
 
 if __name__ == "__main__":
-    REGION = os.getenv("AWS_REGION","us-west")
+    REGION = os.getenv("AWS_REGION","us-east-1")
     detctor = PiiDetector(boto3.client("comprehend", region_name=REGION))
     app.run(debug=True, host="172.31.26.186")
 

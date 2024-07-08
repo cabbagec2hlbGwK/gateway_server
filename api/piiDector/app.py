@@ -16,6 +16,7 @@ class PiiDetector:
 
     def detect_languages(self, text):
         try:
+            print(text)
             response = self.model.detect_dominant_language(Text=text)
             languages = response["Languages"]
             logger.info("Detected %s languages.", len(languages))

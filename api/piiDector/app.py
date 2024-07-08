@@ -64,7 +64,7 @@ def root():
 @app.route("/detect", methods=['POST'])
 def detect():
     data = request.json
-    res = detctor.scan(data)
+    res = detctor.scan(data.get("text"))
     return str(res)
     
 

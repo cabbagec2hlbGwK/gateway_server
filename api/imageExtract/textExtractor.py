@@ -7,7 +7,7 @@ import os
 from flask import Flask, request, jsonify
 
 REGION = os.getenv("AWS_REGION","us-west-1")
-textract = boto3.client('textract', region_name='us-west-1')
+textract = boto3.client('textract', region_name=REGION)
 app = Flask(__name__)
 
 @app.route("/extract", methods=["POST"])
@@ -56,5 +56,5 @@ def extract_pdf(data):
     return text     
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8080, host="172.31.26.186")
 

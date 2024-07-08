@@ -3,7 +3,10 @@ from werkzeug.datastructures import FileStorage
 from pdf2image import convert_from_bytes
 from PIL import Image
 import io
+import os
 from flask import Flask, request, jsonify
+
+REGION = os.getenv("AWS_REGION","us-west-1")
 textract = boto3.client('textract', region_name='us-west-1')
 app = Flask(__name__)
 

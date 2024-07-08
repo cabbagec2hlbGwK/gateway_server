@@ -1,4 +1,5 @@
 from os.path import commonpath
+from botocore import regions
 from flask import Flask, request, send_file, redirect, url_for
 import requests
 import os, re
@@ -69,6 +70,7 @@ def extract():
         return str(res)
 
 if __name__ == "__main__":
-    detctor = PiiDetector(boto3.client("comprehend"))
+    REGION = os.getenv("AWS_REGION","us-west-1")
+    detctor = PiiDetector(boto3.client("comprehend", regions=REGION))
     app.run(debug=True, host="")
 

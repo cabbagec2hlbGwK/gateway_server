@@ -1,6 +1,6 @@
 from os.path import commonpath
 from flask import Flask, request, send_file, redirect, url_for
-import requestss
+import requests
 import os, re
 import crim as CommonRegex
 from botocore.exceptions import ClientError

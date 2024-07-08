@@ -70,7 +70,7 @@ def extract():
         return str(res)
 
 if __name__ == "__main__":
-    REGION = os.getenv("AWS_REGION","us-west-1")
+    REGION = os.getenv("AWS_REGION","us-west")
     detctor = PiiDetector(boto3.client("comprehend", region_name=REGION))
     app.run(debug=True, host="172.31.26.186")
 

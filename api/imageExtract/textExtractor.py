@@ -18,7 +18,7 @@ def extr():
 
     try:
         file_content = file.read()
-         if "pdf" in file.content_type.split("/")[1]:
+        if "pdf" in file.content_type.split("/")[1]:
             print("extracting pdf")
         extracted_text = extract(file_content)
         return jsonify({"text": extracted_text}), 200

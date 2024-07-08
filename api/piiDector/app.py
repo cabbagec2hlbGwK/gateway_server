@@ -26,10 +26,10 @@ class PiiDetector:
             return languages
 
 
-    def detect_pii(self, text, language_code):
+    def detect_pii(self, text):
         try:
             response = self.model.detect_pii_entities(
-                Text=text, LanguageCode=language_code
+                Text=text
             )
             entities = response["Entities"]
             logger.info("Detected %s PII entities.", len(entities))
@@ -40,7 +40,7 @@ class PiiDetector:
             return entities
 
     def scan(self, data):
-        found = self.detect_pii(data, self.detect_languages(data))
+        found = self.detect_pii(data)
         return found
             
 

@@ -3,36 +3,47 @@ from flask import Flask, request, send_file, redirect, url_for
 import requestss
 import os, re
 import crim as CommonRegex
+from botocore.exceptions import ClientError
+import logging
+import boto3
+
+logger = logging.getLogger(__name__)
 
 class PiiDetector:
-    def __init__(self):
-        pass
-    def getPii(self,data):
-        found = dict()
-        found["email"] = CommonRegex.emails(data)
-        found["link"] = CommonRegex.links(data)
-        found["visa"] = CommonRegex.visa_cards(data)
-        found["master"] = CommonRegex.master_cards(data)
-        found["credit"] = CommonRegex.credit_cards(data)
-        found["address"] = CommonRegex.street_addresses(data)
-        found["phone"] = CommonRegex.phones(data)
-        found["ip4"] = CommonRegex.ipv4s(data)
-        found["ip6"] = CommonRegex.ipv6s(data)
-        found["snn"] = CommonRegex.ssn_numbers(data)
-        return found
+    def __init__(self, comprehend):
+        self.model = comprehend
 
+    def detect_languages(self, text):
+        try:
+            response = self.model.detect_dominant_language(Text=text)
+            languages = response["Languages"]
+            logger.info("Detected %s languages.", len(languages))
+        except ClientError:
+            logger.exception("Couldn't detect languages.")
+            raise
+        else:
+            return languages
+
+
+    def detect_pii(self, text, language_code):
+        try:
+            response = self.model.detect_pii_entities(
+                Text=text, LanguageCode=language_code
+            )
+            entities = response["Entities"]
+            logger.info("Detected %s PII entities.", len(entities))
+        except ClientError:
+            logger.exception("Couldn't detect PII entities.")
+            raise
+        else:
+            return entities
 
     def scan(self, data):
-        detected = dict()
-        found = self.getPii(data)
-        for pii in found.keys():
-            if len(found.get(pii)) >0:
-                detected[pii] = found.get(pii)
-        return detected
+        found = self.detect_pii(data, self.detect_languages(data))
+        return found
             
 
 app = Flask(__name__)
-detctor = PiiDetector()
 
 def detect(data):
     pass
@@ -58,5 +69,6 @@ def extract():
         return str(res)
 
 if __name__ == "__main__":
+    detctor = PiiDetector(boto3.client("comprehend"))
     app.run(debug=True, host="")
 

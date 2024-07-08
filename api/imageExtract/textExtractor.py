@@ -3,6 +3,7 @@ from werkzeug.datastructures import FileStorage
 from pdf2image import convert_from_bytes
 from PIL import Image
 import io
+import os
 import argparse
 from flask import Flask, request, jsonify
 
@@ -10,8 +11,9 @@ parser = argparse.ArgumentParser(description="Email reciver to handel reciving a
 parser.add_argument("--host", required=True)
 args = parser.parse_args()
 
+REGION = os.getenv("AWS_REGION","us-east-1")
 
-textract = boto3.client('textract')
+textract = boto3.client('textract', region_name=REGION)
 app = Flask(__name__)
 
 @app.route("/extract", methods=["POST"])

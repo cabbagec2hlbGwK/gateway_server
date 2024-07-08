@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 import logging
 import boto3
 import argparse
+import os
 
 logger = logging.getLogger(__name__)
 

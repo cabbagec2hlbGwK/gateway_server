@@ -46,9 +46,11 @@ class PiiDetector:
 
     def scan(self, data):
         found = self.detect_pii(data, self.detect_languages(data))
-        jsonData = json.loads(res.text.replace("'",'"'))
-        for pii in jsonData:
-            print(pii)
+        piis = dict()
+        for pii in found:
+            value = data[pii.get("BeginOffset"):pii.get("EndOffset")]
+            piis[value] = pii.get("Type")
+        print(piis)
         return found
             
 

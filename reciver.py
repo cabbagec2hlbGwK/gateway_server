@@ -7,6 +7,7 @@ import ssl
 import subprocess
 import smtplib
 import json
+import pprint
 from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
 from email import message_from_bytes
@@ -47,7 +48,7 @@ class MessageHandler:
         print(f"Message: {emailMess}, Attachments: {len(attachments)}")
         url = f"http://{args.api}:5000/detect"
         res = requests.post(url, json={"text":str(emailMess)})
-        print(res.text)
+        pprint.pprint(res.text)
 
         for attachment in attachments:
             metadata = attachment.get("Content-Type").split(";")
@@ -56,7 +57,7 @@ class MessageHandler:
             files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
             url = f"http://{args.api}:5000/extract"
             res = requests.post(url, files=files)
-            print(res.text)
+            pprint.pprint(res.text)
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()

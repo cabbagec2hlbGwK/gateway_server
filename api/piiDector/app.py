@@ -46,6 +46,9 @@ class PiiDetector:
 
     def scan(self, data):
         found = self.detect_pii(data, self.detect_languages(data))
+        jsonData = json.loads(res.text.replace("'",'"'))
+        for pii in jsonData:
+            print(pii)
         return found
             
 

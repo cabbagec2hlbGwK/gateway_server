@@ -52,7 +52,7 @@ class MessageHandler:
             files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
             url = f"http://{args.api}:5000/extract"
             res = requests.post(url, files=files)
-            print(res.text)
+            print(type(res.text))
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()

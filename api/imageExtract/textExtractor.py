@@ -59,5 +59,5 @@ def extract_pdf(data):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(host="172.31.26.186", port=8080)
 

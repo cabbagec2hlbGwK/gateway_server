@@ -51,7 +51,7 @@ class PiiDetector:
             value = data[pii.get("BeginOffset"):pii.get("EndOffset")]
             piis[value] = pii.get("Type")
         print(piis)
-        return found
+        return piis
             
 
 app = Flask(__name__)

@@ -61,6 +61,13 @@ app = Flask(__name__)
 def root():
     return send_file('assets/index.html')
 
+@app.route("/detect", methods=['POST'])
+def detect():
+    data = request.json
+    res = detctor.scan(data)
+    return str(res)
+    
+
 @app.route("/extract", methods=['POST'])
 def extract():
     if 'test' not in request.files:

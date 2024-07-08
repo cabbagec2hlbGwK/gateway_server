@@ -45,6 +45,9 @@ class MessageHandler:
         else:
             emailMess = body
         print(f"Message: {emailMess}, Attachments: {len(attachments)}")
+        url = f"http://{args.api}:5000/detect"
+        res = requests.post(url, json={"text":emailMess})
+        print(res.text)
 
         for attachment in attachments:
             metadata = attachment.get("Content-Type").split(";")

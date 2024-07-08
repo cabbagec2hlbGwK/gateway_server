@@ -28,7 +28,7 @@ class PiiDetector:
             logger.exception("Couldn't detect languages.")
             raise
         else:
-            return languages
+            return "en"
 
 
     def detect_pii(self, text, language_code):
@@ -44,12 +44,36 @@ class PiiDetector:
         else:
             return entities
 
+    def isSin(self, text):
+        sin = text.replace(" ", "").replace("-", "")
+        if len(sin)>=10:
+            return "PHONE"
+
+        if not sin.isdigit() or len(sin) != 9:
+            return "PHONE"
+
+        digits = [int(d) for d in sin]
+
+        checksum = 0
+        for i in range(9):
+            if i % 2 == 0:
+                checksum += digits[i]
+            else: 
+                doubled = digits[i] * 2
+                checksum += doubled if doubled < 10 else doubled - 9
+        if checksum % 10 ==0:
+            return "Canadian SIN"
+        else:
+            return "PHONE"
+
     def scan(self, data):
         found = self.detect_pii(data, self.detect_languages(data))
         piis = dict()
         for pii in found:
             value = data[pii.get("BeginOffset"):pii.get("EndOffset")]
             piis[value] = pii.get("Type")
+            if "PHONE" in pii.get("Type"):
+                piis[value] = self.isSin(value)
         print(piis)
         return piis
             

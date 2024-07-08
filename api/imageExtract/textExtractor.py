@@ -3,7 +3,13 @@ from werkzeug.datastructures import FileStorage
 from pdf2image import convert_from_bytes
 from PIL import Image
 import io
+import argparse
 from flask import Flask, request, jsonify
+
+parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
+parser.add_argument("--host", required=True)
+args = parser.parse_args()
+
 
 textract = boto3.client('textract')
 app = Flask(__name__)
@@ -59,5 +65,5 @@ def extract_pdf(data):
 
 
 if __name__ == "__main__":
-    app.run(host="172.31.26.186", port=8080)
+    app.run(host=args.host, port=8080)
 

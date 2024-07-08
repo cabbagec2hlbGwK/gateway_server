@@ -1,14 +1,17 @@
-from os.path import commonpath
-from botocore import regions
+import argparse
 from flask import Flask, request, send_file, redirect, url_for
 import requests
-import os, re
-import crim as CommonRegex
 from botocore.exceptions import ClientError
 import logging
 import boto3
+import argparse
 
 logger = logging.getLogger(__name__)
+
+parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
+parser.add_argument("--host", required=True)
+args = parser.parse_args()
+
 
 class PiiDetector:
     def __init__(self, comprehend):
@@ -47,8 +50,6 @@ class PiiDetector:
 
 app = Flask(__name__)
 
-def detect(data):
-    pass
 
 @app.route("/")
 def root():
@@ -65,7 +66,7 @@ def extract():
     
     if file:
         files = {'test': (file.filename, file.stream, file.mimetype)}
-        res = requests.post(url="http://172.31.26.186:8080/extract", files=files)
+        res = requests.post(url=f"http://{args.host}:8080/extract", files=files)
         print(res.text)
         res = detctor.scan(res.text)
         return str(res)
@@ -73,5 +74,5 @@ def extract():
 if __name__ == "__main__":
     REGION = os.getenv("AWS_REGION","us-east-1")
     detctor = PiiDetector(boto3.client("comprehend", region_name=REGION))
-    app.run(debug=True, host="172.31.26.186")
+    app.run(debug=True, host=args.host)
 

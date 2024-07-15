@@ -6,6 +6,7 @@ import logging
 import boto3
 import argparse
 import os
+from piivalidator import PiiValidator
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,10 @@ args = parser.parse_args()
 class PiiDetector:
     def __init__(self, comprehend):
         self.model = comprehend
+        KEY = os.getenv("azurelanguage")
+        ENDPOINT = "https://digicontrolpiidetect.cognitiveservices.azure.com/language/:analyze-text?api-version=2022-05-01"
+        validatpr = PiiValidator(KEY, ENDPOINT)
+        self.azure = validatpr
 
     def detect_languages(self, text):
         try:
@@ -43,6 +48,15 @@ class PiiDetector:
             raise
         else:
             return entities
+
+    def azureScan(self, text):
+        pii = self.azure.validate([text])
+        piis = []
+        for p in pii:
+            if p.get("confidenceScore") > 0.88:
+                print(p)
+                piis.append(p)
+        return piis
 
     def isSin(self, text):
         sin = text.replace(" ", "").replace("-", "")
@@ -106,7 +120,8 @@ def extract():
         res = requests.post(url=f"http://{args.host}:8080/extract", files=files)
         print(res.text)
         res = detctor.scan(res.text)
-        return str(res)
+        azure = detctor.azureScan(res.text)
+        return str(res)+" ".join(azure)
 
 if __name__ == "__main__":
     REGION = os.getenv("AWS_REGION","us-east-1")

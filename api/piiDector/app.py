@@ -119,9 +119,9 @@ def extract():
         files = {'test': (file.filename, file.stream, file.mimetype)}
         res = requests.post(url=f"http://{args.host}:8080/extract", files=files)
         print(res.text)
-        res = detctor.scan(res.text)
+        respii = detctor.scan(res.text)
         azure = detctor.azureScan(res.text)
-        return str(res)+" ".join(azure)
+        return str(respii)+" ".join(azure)
 
 if __name__ == "__main__":
     REGION = os.getenv("AWS_REGION","us-east-1")

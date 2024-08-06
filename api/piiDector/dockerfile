@@ -1,0 +1,16 @@
+FROM ubuntu
+
+WORKDIR /piiDector
+COPY . .
+ENV API_ENDPOINT=localhost
+ENV azurelanguage="none"
+ENV AWS_API="none"
+
+RUN apt update
+RUN apt install python3 pip -y
+RUN pip install -r ./requirements.txt
+RUN echo '$APIHOST'
+CMD ["python3", "app.py", "--host", "0.0.0.0"]
+EXPOSE 5000
+
+

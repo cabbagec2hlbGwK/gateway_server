@@ -8,11 +8,12 @@ import argparse
 import os
 from piivalidator import PiiValidator
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger("pii_dector_app")
 
 parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
 parser.add_argument("--host", required=True)
 args = parser.parse_args()
+apiEndpoint = os.getenv("API_ENDPOINT","localhost")
 
 
 class PiiDetector:
@@ -25,12 +26,12 @@ class PiiDetector:
 
     def detect_languages(self, text):
         try:
-            print(text)
+            log.debug(text)
             response = self.model.detect_dominant_language(Text=text)
             languages = response['Languages'][0]['LanguageCode']
-            logger.info("Detected %s languages.", len(languages))
+            log.info("Detected %s languages.", len(languages))
         except ClientError:
-            logger.exception("Couldn't detect languages.")
+            log.exception("Couldn't detect languages.")
             raise
         else:
             return "en"
@@ -42,9 +43,9 @@ class PiiDetector:
                 Text=text, LanguageCode=str(language_code)
             )
             entities = response["Entities"]
-            logger.info("Detected %s PII entities.", len(entities))
+            log.info("Detected %s PII entities.", len(entities))
         except ClientError:
-            logger.exception("Couldn't detect PII entities.")
+            log.exception("Couldn't detect PII entities.")
             raise
         else:
             return entities
@@ -54,7 +55,7 @@ class PiiDetector:
         piis = []
         for p in pii:
             if p.get("confidenceScore") > 0.88:
-                print(p)
+                log.debug(p)
                 piis.append(p)
         return piis
 
@@ -88,7 +89,7 @@ class PiiDetector:
             piis[value] = pii.get("Type")
             if "PHONE" in pii.get("Type"):
                 piis[value] = self.isSin(value)
-        print(piis)
+        log.debug(piis)
         return piis
             
 
@@ -117,11 +118,11 @@ def extract():
     
     if file:
         files = {'test': (file.filename, file.stream, file.mimetype)}
-        res = requests.post(url=f"http://{args.host}:8080/extract", files=files)
-        print(res.text)
+        res = requests.post(url=f"http://{apiEndpoint}:8080/extract", files=files)
+        log.debug(res.text)
         respii = detctor.scan(res.text)
         azure = detctor.azureScan(res.text)
-        print(azure)
+        log.debug(azure)
         return str(respii)
 
 if __name__ == "__main__":

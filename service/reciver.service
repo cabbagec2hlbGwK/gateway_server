@@ -1,0 +1,13 @@
+[Unit]
+Description=Reciver handels all the incoming email requests, followed by sending it to the main sqs
+After=network.target
+
+[Service]
+ExecStart=NULL
+Restart=always
+User=your_username
+Group=your_groupname
+Environment=env1=testenv2=test
+
+[Install]
+WantedBy=default.target

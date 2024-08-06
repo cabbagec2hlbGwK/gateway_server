@@ -1,0 +1,5 @@
+boto3==1.34.137
+Flask==2.3.2
+pdf2image==1.17.0
+Pillow==10.4.0
+Werkzeug==3.0.3

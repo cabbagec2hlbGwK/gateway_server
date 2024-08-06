@@ -1,5 +1,5 @@
-from email.message import EmailMessage
 import requests
+import logging
 import base64
 import os
 import argparse
@@ -12,7 +12,10 @@ from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
 from email import message_from_bytes
 from email.policy import default
+from email.message import EmailMessage
 
+
+log = logging.getLogger("reciver")
 
 #------------Section for setingup cert and args--------------------------------
 parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
@@ -37,6 +40,7 @@ class MessageHandler:
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
         message = message_from_bytes(envelope.content, policy=default)
+        data = {"message":message, "rcpttos":rcpttos,"mailfrom":mailfrom}
         body = message.get_payload()
         emailMess = None
         attachments = list()
@@ -45,10 +49,10 @@ class MessageHandler:
             attachments = body[1:]
         else:
             emailMess = body
-        print(f"Message: {emailMess}, Attachments: {len(attachments)}")
+        log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
         url = f"http://{args.api}:5000/detect"
         res = requests.post(url, json={"text":str(emailMess)})
-        pprint.pprint(res.text)
+        log.debug(res.text)
 
         for attachment in attachments:
             metadata = attachment.get("Content-Type").split(";")
@@ -57,7 +61,7 @@ class MessageHandler:
             files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
             url = f"http://{args.api}:5000/extract"
             res = requests.post(url, files=files)
-            pprint.pprint(res.text)
+            log.debug(res.text)
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()
@@ -77,6 +81,7 @@ class ControllerStarttls(Controller):
 if __name__ == "__main__":
     controller = ControllerStarttls(MessageHandler(), port=args.port,  hostname=args.ip)
     controller.start()
-    input('Running STARTTLS server. Press enter to stop.\n')
+    log.info('Running STARTTLS server. Press enter to stop.')
+    input()
     controller.stop()
     

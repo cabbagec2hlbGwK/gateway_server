@@ -47,6 +47,8 @@ class MessageHandler:
         bucketName = os.getenv("S3BUCKET","testbbuckker12")
         s3Manager = S3Manage(key, bucketName)
         key = s3Manager.s3Put(data)
+        data = s3Manager.s3Get(key)
+        print(data)
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()

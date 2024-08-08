@@ -52,7 +52,7 @@ class MessageHandler:
         data = {"message":message,"mailfrom":mailfrom,"rcpttos":rcpttos}
 
         ObjectKey = s3Manager.s3Put(data)
-        queueElement = {"id":str(uuid.uuid4()),"s3Key":ObjectKey,"from":mailfrom, "rcpttos":rcpttos,"timeStamp":datetime.now()} 
+        queueElement = {"id":str(uuid.uuid4()),"s3Key":ObjectKey,"from":mailfrom, "rcpttos":rcpttos,"timeStamp":str(datetime.now())} 
         procucer.send_message(json.dumps(queueElement))
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:

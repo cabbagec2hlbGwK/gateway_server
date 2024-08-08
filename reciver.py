@@ -1,20 +1,19 @@
-import requests
 import logging
-import base64
 import os
 import argparse
 import ssl
 import subprocess
 import smtplib
 import json
-import pprint
-import pickle
+import uuid
+from datetime import datetime
 from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
 from email import message_from_bytes
 from email.policy import default
 from email.message import EmailMessage
 from utils.manageS3 import S3Manage
+from utils.manageQueue import SqsProcucer
 
 
 log = logging.getLogger("reciver")
@@ -38,23 +37,30 @@ context.load_cert_chain(f'cert{os.path.sep}cert.pem', f'cert{os.path.sep}key.pem
 
 class MessageHandler:
     async def handle_DATA(self, server, session, envelope):
-        peer = session.peer
+        key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
+        bucketName = os.getenv("S3BUCKET","testbbuckker12")
+        s3Manager = S3Manage(key, bucketName)
+
+        url = os.getenv("SQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/DCEMAIL.fifo")
+        procucer = SqsProcucer(url)
+        print("created")
+
+
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
         message = message_from_bytes(envelope.content, policy=default)
         data = {"message":message,"mailfrom":mailfrom,"rcpttos":rcpttos}
-        key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
-        bucketName = os.getenv("S3BUCKET","testbbuckker12")
-        s3Manager = S3Manage(key, bucketName)
-        key = s3Manager.s3Put(data)
-        data = s3Manager.s3Get(key)
-        print(data)
+
+        ObjectKey = s3Manager.s3Put(data)
+        queueElement = {"id":uuid.uuid4(),"s3Key":ObjectKey,"from":mailfrom, "rcpttos":rcpttos,"timeStamp":datetime.now()} 
+        procucer.send_message(json.dumps(queueElement))
 
         with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
             smtp.ehlo()
             smtp.starttls()
             smtp.send_message(message, mailfrom, rcpttos)
             smtp.quit()
+        del s3Manager
         return '250 OK' ### ADDED RETURN
 
 # Pass SSL context to aiosmtpd

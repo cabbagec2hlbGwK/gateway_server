@@ -15,6 +15,7 @@ def process(envelope, args):
     mailfrom = envelope.mail_from
     rcpttos = envelope.rcpt_tos
     message = message_from_bytes(envelope.content, policy=default)
+    data = {"message":message, "rcpttos":rcpttos,"mailfrom":mailfrom}
     body = message.get_payload()
     emailMess = None
     attachments = list()
@@ -27,21 +28,15 @@ def process(envelope, args):
     url = f"http://{args.api}:5000/detect"
     res = requests.post(url, json={"text":str(emailMess)})
     log.debug(res.text)
-    print(f"Message: {emailMess}, Attachments: {len(attachments)}, {res.text}")
 
     for attachment in attachments:
-        try:
-            metadata = attachment.get("Content-Type").split(";")
-            contentType = metadata[0].strip()
-            name = metadata[1].split("=")[1].replace('"','').strip()
-            files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
-            url = f"http://{args.api}:5000/extract"
-            res = requests.post(url, files=files)
-            log.debug(res.text)
-        except Exception as e:
-            print("the following error happened")
-            print(e)
-        
+        metadata = attachment.get("Content-Type").split(";")
+        contentType = metadata[0].strip()
+        name = metadata[1].split("=")[1].replace('"','').strip()
+        files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
+        url = f"http://{args.api}:5000/extract"
+        res = requests.post(url, files=files)
+        log.debug(res.text)
 
     with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
         smtp.ehlo()

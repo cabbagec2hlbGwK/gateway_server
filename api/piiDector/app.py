@@ -55,6 +55,7 @@ class PiiDetector:
     def azureScan(self, text):
         pii = self.azure.validate([text])
         piis = []
+        return[]
         for p in pii:
             if p.get("confidenceScore") > 0.88:
                 log.debug(p)

@@ -64,8 +64,8 @@ def main():
 
     @consumer.process
     def handel_event(message):
+        print(type(message))
         objKey = message.get("s3Key")
-        print(objKey)
         data = s3Manager.s3Get(objKey)
         process(data.get("envelope","there was nothing ther"),args)
         

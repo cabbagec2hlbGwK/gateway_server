@@ -11,7 +11,6 @@ from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
 from email import message_from_bytes
 from email.policy import default
-from email.message import EmailMessage
 from utils.manageS3 import S3Manage
 from utils.manageQueue import SqsProcucer
 
@@ -49,7 +48,7 @@ class MessageHandler:
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
         message = message_from_bytes(envelope.content, policy=default)
-        data = {"message":message,"mailfrom":mailfrom,"rcpttos":rcpttos}
+        data = {"envelope":envelope,"mailfrom":mailfrom,"rcpttos":rcpttos}
 
         ObjectKey = s3Manager.s3Put(data)
         queueElement = {"id":str(uuid.uuid4()),"s3Key":ObjectKey,"from":mailfrom, "rcpttos":rcpttos,"timeStamp":str(datetime.now())} 

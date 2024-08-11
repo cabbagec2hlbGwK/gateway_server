@@ -16,8 +16,12 @@ class SqsConsumer:
         self.sqsUrl = sqsUrl
         self.sqs = boto3.client('sqs')
 
+    def process(self,f):
+        self.processFunction = f
+
     def process_message(self, message):
         print(f"Processing message: {message['Body']}")
+        self.processFunction(message = json.loads(message))
 
     def consume_messages(self):
         try:

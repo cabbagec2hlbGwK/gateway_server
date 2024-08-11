@@ -44,6 +44,7 @@ class PiiDetector:
                 Text=text, LanguageCode=str(language_code)
             )
             entities = response["Entities"]
+            print(entities)
             log.info("Detected %s PII entities.", len(entities))
         except ClientError:
             log.exception("Couldn't detect PII entities.")

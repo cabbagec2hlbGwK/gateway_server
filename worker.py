@@ -12,8 +12,6 @@ from utils.manageQueue import SqsConsumer
 log = logging.getLogger("worker_task")
 
 def process(envelope, args):
-    print(print(envelope))
-    return
     mailfrom = envelope.mail_from
     rcpttos = envelope.rcpt_tos
     message = message_from_bytes(envelope.content, policy=default)

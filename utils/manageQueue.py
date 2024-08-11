@@ -21,7 +21,7 @@ class SqsConsumer:
 
     def process_message(self, message):
         print(f"Processing message: {message['Body']}")
-        self.processFunction(message = json.loads(message))
+        self.processFunction(message)
 
     def consume_messages(self):
         try:

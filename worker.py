@@ -65,7 +65,7 @@ def main():
         print(f"{type(message)}, {message}")
         objKey = message["s3Key"]
         data = s3Manager.s3Get(objKey)
-        
+        process(data.get("envelope"),args)
 
     consumer.consume_messages()
 

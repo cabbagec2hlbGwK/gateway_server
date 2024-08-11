@@ -44,7 +44,6 @@ class PiiDetector:
                 Text=text, LanguageCode=str(language_code)
             )
             entities = response["Entities"]
-            print(entities)
             log.info("Detected %s PII entities.", len(entities))
         except ClientError:
             log.exception("Couldn't detect PII entities.")
@@ -93,6 +92,7 @@ class PiiDetector:
             if "PHONE" in pii.get("Type"):
                 piis[value] = self.isSin(value)
         log.debug(piis)
+        print(piis)
         return piis
             
 

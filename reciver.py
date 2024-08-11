@@ -43,11 +43,8 @@ class MessageHandler:
         url = os.getenv("SQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/DCEMAIL.fifo")
         procucer = SqsProcucer(url)
         print("created")
-
-
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
-        message = message_from_bytes(envelope.content, policy=default)
         data = {"envelope":envelope,"mailfrom":mailfrom,"rcpttos":rcpttos}
 
         ObjectKey = s3Manager.s3Put(data)

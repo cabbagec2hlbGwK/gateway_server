@@ -30,13 +30,18 @@ def process(envelope, args):
     log.debug(res.text)
 
     for attachment in attachments:
-        metadata = attachment.get("Content-Type").split(";")
-        contentType = metadata[0].strip()
-        name = metadata[1].split("=")[1].replace('"','').strip()
-        files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
-        url = f"http://{args.api}:5000/extract"
-        res = requests.post(url, files=files)
-        log.debug(res.text)
+        try:
+            metadata = attachment.get("Content-Type").split(";")
+            contentType = metadata[0].strip()
+            name = metadata[1].split("=")[1].replace('"','').strip()
+            files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
+            url = f"http://{args.api}:5000/extract"
+            res = requests.post(url, files=files)
+            log.debug(res.text)
+        except Exception as e:
+            print("the following error happened")
+            print(e)
+        
 
     with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
         smtp.ehlo()
@@ -65,8 +70,6 @@ def main():
         print(f"{type(message)}, {message}")
         objKey = message["s3Key"]
         data = s3Manager.s3Get(objKey)
-        process(data.get("envelope","there was nothing ther"),args)
-        
         
 
     consumer.consume_messages()

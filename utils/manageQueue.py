@@ -24,7 +24,7 @@ class SqsConsumer:
             print("no message found")
             return
         print(f"Processing message: {message['Body']}")
-        self.processFunction(message)
+        self.processFunction(message['Body'])
 
     def consume_messages(self):
         try:

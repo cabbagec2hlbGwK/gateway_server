@@ -12,8 +12,9 @@ log = logging.getLogger("pii_dector_app")
 
 parser = argparse.ArgumentParser(description="Email reciver to handel reciving and QQ of the messages")
 parser.add_argument("--host", required=True)
+parser.add_argument("--api", required=True)
 args = parser.parse_args()
-apiEndpoint = os.getenv("API_ENDPOINT","localhost")
+apiEndpoint = args.api
 
 
 class PiiDetector:

@@ -20,6 +20,9 @@ class SqsConsumer:
         self.processFunction = f
 
     def process_message(self, message):
+        if not message:
+            print("no message found")
+            return
         print(f"Processing message: {message['Body']}")
         self.processFunction(message)
 

@@ -32,11 +32,7 @@ def process(envelope, args):
         metadata = attachment.get("Content-Type").split(";")
         contentType = metadata[0].strip()
         name = metadata[1].split("=")[1].replace('"','').strip()
-        rawBits = attachment.get_payload()
-        print(rawBits)
-        if len(rawBits) % 4 == 0:
-            print(f"-------------------------------------{len(rawBits)}")
-            rawBits = base64.b64decode(attachment.get_payload())
+        rawBits = base64.b64decode(attachment.get_payload())
         files =  {'test': (name, rawBits, contentType)}
         url = f"http://{args.api}:5000/extract"
         res = requests.post(url, files=files)

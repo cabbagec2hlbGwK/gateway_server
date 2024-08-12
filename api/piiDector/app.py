@@ -3,6 +3,7 @@ from flask import Flask, request, send_file, redirect, url_for
 import requests
 from botocore.exceptions import ClientError
 import logging
+import json
 import boto3
 import argparse
 import os
@@ -93,7 +94,7 @@ class PiiDetector:
                 piis[value] = self.isSin(value)
         log.debug(piis)
         print(piis)
-        return piis
+        return json.dumps(piis)
             
 
 app = Flask(__name__)
@@ -107,7 +108,7 @@ def root():
 def detect():
     data = request.json
     res = detctor.scan(data.get("text"))
-    return str(res)
+    return res
     
 
 @app.route("/extract", methods=['POST'])

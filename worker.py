@@ -3,7 +3,7 @@ import logging
 import base64
 import os
 import argparse
-import smtplib
+import json
 from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage
@@ -38,8 +38,9 @@ def process(envelope, args):
         log.debug(res.text)
     print(text)
     url = f"http://{args.api}:5000/detect"
-    res = requests.post(url, json={"text":text+str(emailMess)})
-    print(res.text)
+    res = requests.post(url, json={"text":text+str(emailMess)}) 
+    res = json.loads(res.text)
+    print(res)
 
 
 def main():

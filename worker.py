@@ -39,7 +39,7 @@ def process(envelope, args):
     print(text)
     url = f"http://{args.api}:5000/detect"
     res = requests.post(url, json={"text":text+str(emailMess)}) 
-    res = json.loads(res.text)
+    #res = json.loads(res.text)
     print(res)
 
 

@@ -27,6 +27,7 @@ def process(envelope, args):
     log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
 
     text = ""
+    print(len(attachments))
     for attachment in attachments:
         metadata = attachment.get("Content-Type").split(";")
         contentType = metadata[0].strip()

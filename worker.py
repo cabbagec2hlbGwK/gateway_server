@@ -38,6 +38,7 @@ def process(envelope, args):
         url = f"http://{args.api}:5000/extract"
         res = requests.post(url, files=files)
         text += res.text
+        print(res.text)
         log.debug(res.text)
     print(text)
     url = f"http://{args.api}:5000/detect"

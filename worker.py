@@ -38,8 +38,8 @@ def process(envelope, args):
         log.debug(res.text)
     print(text)
     url = f"http://{args.api}:5000/detect"
-    res = requests.post(url, json={"text":str(emailMess)})
-    log.debug(res.text)
+    res = requests.post(url, json={"text":text+str(emailMess)})
+    print(res.text)
 
 
 def main():

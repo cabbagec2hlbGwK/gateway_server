@@ -33,7 +33,7 @@ def process(envelope, args):
         contentType = metadata[0].strip()
         name = metadata[1].split("=")[1].replace('"','').strip()
         print("inside the damn thing")
-        print(emailMess)
+        print(attachment.get_payload())
         files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
         url = f"http://{args.api}:5000/extract"
         res = requests.post(url, files=files)

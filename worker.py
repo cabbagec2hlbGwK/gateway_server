@@ -34,6 +34,7 @@ def process(envelope, args):
         name = metadata[1].split("=")[1].replace('"','').strip()
         rawBits = attachment.get_payload()
         if len(rawBits) % 4 == 0:
+            print(f"-------------------------------------{len(rawBits)}")
             rawBits = base64.b64decode(attachment.get_payload())
         files =  {'test': (name, rawBits, contentType)}
         url = f"http://{args.api}:5000/extract"

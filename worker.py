@@ -15,7 +15,6 @@ def process(envelope, args):
     mailfrom = envelope.mail_from
     rcpttos = envelope.rcpt_tos
     message = message_from_bytes(envelope.content, policy=default)
-    print("inside the damn thing")
     data = {"message":message, "rcpttos":rcpttos,"mailfrom":mailfrom}
     body = message.get_payload()
     emailMess = None
@@ -26,6 +25,7 @@ def process(envelope, args):
     else:
         emailMess = body
     log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
+    print("inside the damn thing")
 
     text = ""
     for attachment in attachments:

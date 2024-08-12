@@ -6,13 +6,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>SQS Message Modal</title>
     <script>
-        // Auto-refresh the page every 2 seconds only if there is no message
         window.onload = function() {
             const messageContent = "{{ message_body }}".trim();
             if (!messageContent) {
                 setTimeout(function() {
                     location.reload();
-                }, 1000);
+                }, 2000);
             }
         };
     </script>
@@ -22,12 +21,12 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content rounded-3 shadow">
           <div class="modal-body p-4 text-center">
-            <h5 class="mb-0">Enable this setting?</h5>
+            <h5 class="mb-0">PII Detected</h5>
             <p class="mb-0">{{ message_body }}</p>
           </div>
           <div class="modal-footer flex-nowrap p-0">
-            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end" id="approveBtn"><strong>Approve</strong></button>
-            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0" id="denyBtn">Deny</button>
+            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end" id="approveBtn"><strong>Yes, Approve</strong></button>
+            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0" id="denyBtn">No Deny</button>
           </div>
         </div>
       </div>
@@ -45,7 +44,7 @@
                     "receipt_handle": "{{ receipt_handle }}"
                 }),
                 success: function(response) {
-                    location.reload(); // Reload page to fetch new message
+                    location.reload();
                 }
             });
         }

@@ -1,11 +1,12 @@
 from flask import Flask, render_template, jsonify, request
 import boto3
+import json
 
 app = Flask(__name__)
 
 # Configure AWS SQS
 sqs = boto3.client('sqs', region_name='us-east-1')  # Update 'your-region'
-queue_url = 'https://sqs.us-east-1.amazonaws.com/536380612665/DCEMAIL.fifo'  # Update with your SQS Queue URL
+queue_url = 'https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo'  # Update with your SQS Queue URL
 
 def get_message():
     response = sqs.receive_message(
@@ -18,11 +19,17 @@ def get_message():
         return messages[0]
     return None
 
+def format_pii(pii):
+    pii_fields = pii.split()
+    return "\n".join(f"- {field}" for field in pii_fields)
+
 @app.route('/')
 def index():
     message = get_message()
     if message:
-        return render_template('index.html', message_body=message['Body'], receipt_handle=message['ReceiptHandle'])
+        body = json.loads(message['Body'])
+        pii_message = format_pii(body.get('pii', ''))
+        return render_template('index.html', message_body=pii_message, receipt_handle=message['ReceiptHandle'])
     else:
         return "No messages in queue."
 

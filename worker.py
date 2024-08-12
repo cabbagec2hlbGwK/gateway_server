@@ -25,10 +25,8 @@ def process(envelope, args):
     else:
         emailMess = body
     log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
-    url = f"http://{args.api}:5000/detect"
-    res = requests.post(url, json={"text":str(emailMess)})
-    log.debug(res.text)
 
+    text = ""
     for attachment in attachments:
         metadata = attachment.get("Content-Type").split(";")
         contentType = metadata[0].strip()
@@ -36,13 +34,13 @@ def process(envelope, args):
         files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
         url = f"http://{args.api}:5000/extract"
         res = requests.post(url, files=files)
+        text += res.text
         log.debug(res.text)
+    print(text)
+    url = f"http://{args.api}:5000/detect"
+    res = requests.post(url, json={"text":str(emailMess)})
+    log.debug(res.text)
 
-    with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.send_message(message, mailfrom, rcpttos)
-        smtp.quit()
 
 def main():
     parser = argparse.ArgumentParser(description="worker handels the task of processing the information from the queue")

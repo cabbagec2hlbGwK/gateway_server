@@ -3,7 +3,7 @@ import logging
 import base64
 import os
 import argparse
-import smtplib
+import json
 from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage

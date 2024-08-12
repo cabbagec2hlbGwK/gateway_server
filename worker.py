@@ -25,7 +25,6 @@ def process(envelope, args):
     else:
         emailMess = body
     log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
-    print("inside the damn thing")
 
     text = ""
     for attachment in attachments:
@@ -33,6 +32,7 @@ def process(envelope, args):
         contentType = metadata[0].strip()
         name = metadata[1].split("=")[1].replace('"','').strip()
         files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
+        print("inside the damn thing")
         url = f"http://{args.api}:5000/extract"
         res = requests.post(url, files=files)
         text += res.text

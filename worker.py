@@ -29,6 +29,7 @@ def process(envelope, args):
     text = ""
     print(len(attachments))
     for attachment in attachments:
+        print("--------------------------------------------------------")
         metadata = attachment.get("Content-Type").split(";")
         contentType = metadata[0].strip()
         name = metadata[1].split("=")[1].replace('"','').strip()

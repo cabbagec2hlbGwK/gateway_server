@@ -50,7 +50,7 @@ def process(envelope, args):
     print(piiFound)
     url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
     procucer = SqsProcucer(url)
-    procucer.send_message(json.dumps({"pii":' '.join(piiFound)}))
+    procucer.send_message(json.dumps({"pii":" ".join(piiFound)}))
     print("created")
 
 

@@ -43,7 +43,7 @@ def process(envelope, args):
     res = requests.post(url, json={"text":text+str(emailMess)})
     print(res.text)
     piiFound = set()
-    jres = json.loads(res.text)
+    jres = json.loads(res.text.replace("'",'"'))
 
     for i in jres:
         piiFound.add(jres[i])

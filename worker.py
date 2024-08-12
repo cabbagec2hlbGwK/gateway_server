@@ -8,7 +8,7 @@ from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage
 
-from utils.manageQueue import SqsConsumer
+from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
 
 def process(envelope, args):
@@ -44,6 +44,16 @@ def process(envelope, args):
     url = f"http://{args.api}:5000/detect"
     res = requests.post(url, json={"text":text+str(emailMess)})
     print(res.text)
+    piiFound = set()
+    jres = json.loads(res)
+
+    for i in jres:
+        piiFound.add(jres[i])
+    print(piiFound)
+    url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
+    procucer = SqsProcucer(url)
+    procucer.send_message(f"{' '.join(piiFound)}")
+    print("created")
 
 
 def main():

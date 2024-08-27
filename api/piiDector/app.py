@@ -50,6 +50,7 @@ class PiiDetector:
             log.exception("Couldn't detect PII entities.")
             raise
         else:
+            print(entities)
             return entities
 
     def azureScan(self, text):

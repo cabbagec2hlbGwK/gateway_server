@@ -7,7 +7,6 @@ import json
 from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage
-
 from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
 
@@ -27,19 +26,24 @@ def process(envelope, args):
     log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
 
     text = ""
+    keywords = ['png','jpeg','pdf']
     print(len(attachments))
     for attachment in attachments:
-        print("--------------------------------------------------------")
         metadata = attachment.get("Content-Type").split(";")
-        contentType = metadata[0].strip()
-        name = metadata[1].split("=")[1].replace('"','').strip()
-        rawBits = base64.b64decode(attachment.get_payload())
-        files =  {'test': (name, rawBits, contentType)}
-        url = f"http://{args.api}:5000/extract"
-        res = requests.post(url, files=files)
-        text += res.text
-        print(res.text)
-        log.debug(res.text)
+        print("------------------")
+        if any(keyword in item.lower() for item in metadata for keyword in keywords):
+            print("this is runnin  --------------------------*")
+            contentType = metadata[0].strip()
+            name = metadata[1].split("=")[1].replace('"','').strip()
+            rawBits = base64.b64decode(attachment.get_payload())
+            files =  {'test': (name, rawBits, contentType)}
+            url = f"http://{args.api}:5000/extract"
+            res = requests.post(url, files=files)
+            log.debug(res.text)
+            text += res.text
+        if 'text' in attachment:
+            print(emailMess)
+            text += str(attachment) 
     print(text)
     url = f"http://{args.api}:5000/detect"
     res = requests.post(url, json={"text":text+str(emailMess)})

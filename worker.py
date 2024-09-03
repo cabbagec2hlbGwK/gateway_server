@@ -12,7 +12,7 @@ from utils.manageS3 import S3Manage
 from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
 
-def process(envelope, args, message):
+def process(envelope, args, objKey):
     mailfrom = envelope.mail_from
     rcpttos = envelope.rcpt_tos
     message = message_from_bytes(envelope.content, policy=default)
@@ -59,7 +59,7 @@ def process(envelope, args, message):
     if len(piiFound) ==0:
         url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
         procucer = SqsProcucer(url)
-        procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":message.get("s3Key"), "time":str(time.time)}))
+        procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
         print("created")
         return 0
     else:
@@ -67,7 +67,6 @@ def process(envelope, args, message):
         if not url:
             raise Exception("AAPROVALSQS not found")
         producer = SqsProcucer(url)
-        print(f"this is the value :{message['s3Key']}")
         producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":message.get("s3Key"),"timeStamp":time.time()}))
         return 1
 
@@ -94,7 +93,7 @@ def main():
         print(f"{type(message)}, {message}")
         objKey = message["s3Key"]
         data = s3Manager.s3Get(objKey)
-        emailStatus = process(data.get("envelope"),args,message)
+        emailStatus = process(data.get("envelope"),args,objKey)
         if emailStatus != 0:
             print("Pii detected ---------------------")
 

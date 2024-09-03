@@ -1,16 +1,18 @@
 import requests
+import uuid
 import logging
 import base64
 import os
 import argparse
 import json
+import time
 from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage
 from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
 
-def process(envelope, args):
+def process(envelope, args, message):
     mailfrom = envelope.mail_from
     rcpttos = envelope.rcpt_tos
     message = message_from_bytes(envelope.content, policy=default)
@@ -54,10 +56,20 @@ def process(envelope, args):
     for i in jres:
         piiFound.add(jres[i])
     print(piiFound)
-    url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
-    procucer = SqsProcucer(url)
-    procucer.send_message(json.dumps({"pii":" ".join(piiFound)}))
-    print("created")
+    if len(piiFound) ==0:
+        url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
+        procucer = SqsProcucer(url)
+        procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":message.get("s3Key"), "time":str(time.time)}))
+        print("created")
+        return 0
+    else:
+        url = os.getenv("APPROVALSQSURL","")
+        if not url:
+            raise Exception("AAPROVALSQS not found")
+        producer = SqsProcucer(url)
+        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":message.get("s3Key"),"timeStamp":time.time()}))
+        return 1
+
 
 
 def main():
@@ -81,7 +93,10 @@ def main():
         print(f"{type(message)}, {message}")
         objKey = message["s3Key"]
         data = s3Manager.s3Get(objKey)
-        process(data.get("envelope"),args)
+        emailStatus = process(data.get("envelope"),args,message)
+        if emailStatus != 0:
+            print("Pii detected ---------------------")
+
 
     consumer.consume_messages()
 

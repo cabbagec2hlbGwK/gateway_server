@@ -1,0 +1,19 @@
+FROM ubuntu
+
+WORKDIR /Worker
+COPY . .
+
+ENV S3BUCKET = "NULL"
+ENV AWS_DEFAULT = "NULL"
+ENV SENDSQSURL = "NULL"
+ENV SQSURL = "NULL"
+ENV PII_DETECT_API = "NULL"
+ENV AWS_ACCESS_KEY_ID ="NULL"
+ENV AWS_SECRET_ACCESS_KEY="NULL"
+RUN apt update
+RUN apt install python3 pip python3-venv -y
+RUN python3 -m venv env
+RUN env/bin/pip install -r ./requirements.txt
+CMD ["env/bin/python3", "worker.py", "--api", "$PII_DETECT_API"]
+EXPOSE 8080
+

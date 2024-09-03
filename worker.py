@@ -59,7 +59,6 @@ def process(envelope, args, objKey):
     if len(piiFound) ==0:
         url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
         procucer = SqsProcucer(url)
-        print(f"this it the key :{objKey}")
         procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
         print("created")
         return 0
@@ -68,7 +67,7 @@ def process(envelope, args, objKey):
         if not url:
             raise Exception("AAPROVALSQS not found")
         producer = SqsProcucer(url)
-        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":message.get("s3Key"),"timeStamp":time.time()}))
+        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
         return 1
 
 

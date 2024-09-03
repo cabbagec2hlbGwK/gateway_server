@@ -67,6 +67,7 @@ def process(envelope, args, message):
         if not url:
             raise Exception("AAPROVALSQS not found")
         producer = SqsProcucer(url)
+        print(f"this is the value :{message}")
         producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":message.get("s3Key"),"timeStamp":time.time()}))
         return 1
 

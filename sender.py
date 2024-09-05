@@ -38,5 +38,5 @@ def main():
 
     consumer.consume_messages()
 
-
+main()
 

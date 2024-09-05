@@ -1,4 +1,4 @@
-import asyncore
+mport asyncore
 import smtpd
 
 import os

@@ -2,8 +2,13 @@ import smtplib
 import os
 from utils.manageQueue import SqsConsumer
 from utils.manageS3 import S3Manage
+from email import message_from_bytes
+from email.policy import default
 
-def sender(message, mailfrom, rcpttos):
+def sender(envelope):
+    mailfrom = envelope.mail_from
+    rcpttos = envelope.rcpt_tos
+    message = message_from_bytes(envelope.content, policy=default)
     with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
         smtp.ehlo()
         smtp.starttls()
@@ -29,7 +34,7 @@ def main():
         print(f"{type(message)}, {message}")
         objKey = message["s3Key"]
         data = s3Manager.s3Get(objKey)
-        process(data.get("envelope"),args)
+        sender(data.get("envelope"))
 
     consumer.consume_messages()
 

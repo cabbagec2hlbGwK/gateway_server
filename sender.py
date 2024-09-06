@@ -31,10 +31,13 @@ def main():
 
     @consumer.process
     def handel_event(message):
-        print(f"{type(message)}, {message}")
-        objKey = message["s3Key"]
-        data = s3Manager.s3Get(objKey)
-        sender(data.get("envelope"))
+        try:
+            print(f"{type(message)}, {message}")
+            objKey = message["s3Key"]
+            data = s3Manager.s3Get(objKey)
+            sender(data.get("envelope"))
+        except Exception as e:
+            print(e)
 
     consumer.consume_messages()
 

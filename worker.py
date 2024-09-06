@@ -57,7 +57,7 @@ def process(envelope, args, objKey):
         piiFound.add(jres[i])
     print(piiFound)
     if len(piiFound) ==0:
-        url = os.getenv("SENDSQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/scaned.fifo")
+        url = os.getenv("SENDSQSURL","")
         procucer = SqsProcucer(url)
         procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
         print("created")
@@ -91,12 +91,15 @@ def main():
 
     @consumer.process
     def handel_event(message):
-        print(f"{type(message)}, {message}")
-        objKey = message["s3Key"]
-        data = s3Manager.s3Get(objKey)
-        emailStatus = process(data.get("envelope"),args,objKey)
-        if emailStatus != 0:
-            print("Pii detected ---------------------")
+        try:
+            print(f"{type(message)}, {message}")
+            objKey = message["s3Key"]
+            data = s3Manager.s3Get(objKey)
+            emailStatus = process(data.get("envelope"),args,objKey)
+            if emailStatus != 0:
+                print("Pii detected ---------------------")
+        except Exception as e:
+            print(e)
 
 
     consumer.consume_messages()

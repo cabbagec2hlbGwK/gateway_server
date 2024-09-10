@@ -63,9 +63,9 @@ def process(envelope, args, objKey):
         print("created")
         return 0
     else:
-        url = os.getenv("APPROVALSQSURL","")
+        url = os.getenv("OWNERIDENTY","")
         if not url:
-            raise Exception("AAPROVALSQS not found")
+            raise Exception("OWNERIDENTY not found")
         producer = SqsProcucer(url)
         #TODO need the work on the encription on it 
         producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))

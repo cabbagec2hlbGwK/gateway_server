@@ -3,12 +3,13 @@ import os
 import argparse
 import requests
 from utils.manageQueue import SqsConsumer
+from utils.manageQueue import SqsProcucer
 
 def getUser(piiInformation, endpoint):
     endpoint = endpoint
     user = requests.post(url=endpoint, json=piiInformation)
     userJson = json.loads(user.content)
-    print(f"the user is :{userJson.get('user')}")
+    return userJson.get('user')
 
 
 def main():
@@ -16,9 +17,10 @@ def main():
     parser.add_argument("--identity_endpoint", required=True) 
     args = parser.parse_args()
     piiQueue = os.getenv("OWNERIDENTY","https://sqs.us-east-2.amazonaws.com/767397688321/OwnerIdentification.fifo")
-    pendinfApproval = os.getenv("SQSURL","https://sqs.us-east-2.amazonaws.com/767397688321/approval_list.fifo")
+    pendinfApproval = os.getenv("APPROVALSQSURL","https://sqs.us-east-2.amazonaws.com/767397688321/approval_list.fifo")
 
     consumer = SqsConsumer(piiQueue)
+    producer = SqsProcucer(pendinfApproval)
 
         #producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
     @consumer.process
@@ -29,6 +31,8 @@ def main():
             piiFound = json.loads(message["pii"])
             timeStamp = message["timeStamp"]
             user = getUser(piiFound, args.identity_endpoint)
+            producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "pii":piiFound,"user":user, "timeStamp":timeStamp}))
+
         except Exception as e:
             print(e)
 

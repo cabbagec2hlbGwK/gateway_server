@@ -7,7 +7,8 @@ from utils.manageQueue import SqsConsumer
 def getUser(piiInformation, endpoint):
     endpoint = endpoint
     user = requests.post(url=endpoint, json=piiInformation)
-    print(f"the user thay has the  infor is the following :{user.content}")
+    userJson = json.loads(user.content)
+    print(f"the user is :{userJson.get('user')}")
 
 
 def main():

@@ -27,6 +27,7 @@ def main():
             s3Key = message["s3Key"]
             piiFound = json.loads(message["pii"])
             timeStamp = message["timeStamp"]
+            user = getUser(piiFound, args.identity_endpoint)
         except Exception as e:
             print(e)
 

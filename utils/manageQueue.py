@@ -59,9 +59,11 @@ class SqsConsumer:
                         log.error(f"Error processing message: {e}")
 
         except (NoCredentialsError, PartialCredentialsError):
+            print("problem in creds")
             log.error("Credentials not available")
         except Exception as e:
             log.error(f"Error: {e}")
+            print(e)
 
 
 

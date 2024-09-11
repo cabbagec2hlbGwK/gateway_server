@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description="worker handels the task of processing the information from the queue and associate a user to it")
     parser.add_argument("--identity_endpoint", required=True) 
     args = parser.parse_args()
-    piiQueue = os.getenv("SQSURL","https://sqs.us-east-2.amazonaws.com/767397688321/OwnerIdentification.fifo")
+    piiQueue = os.getenv("OWNERIDENTY","https://sqs.us-east-2.amazonaws.com/767397688321/OwnerIdentification.fifo")
     pendinfApproval = os.getenv("SQSURL","https://sqs.us-east-2.amazonaws.com/767397688321/approval_list.fifo")
 
     consumer = SqsConsumer(piiQueue)

@@ -20,7 +20,6 @@ def main():
     pendinfApproval = os.getenv("APPROVALSQSURL","https://sqs.us-east-2.amazonaws.com/767397688321/approval_list.fifo")
 
     consumer = SqsConsumer(piiQueue)
-    producer = SqsProcucer(pendinfApproval)
 
         #producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
     @consumer.process
@@ -31,8 +30,8 @@ def main():
             piiFound = json.loads(message["pii"])
             timeStamp = message["timeStamp"]
             user = getUser(piiFound, args.identity_endpoint)
+            producer = SqsProcucer(pendinfApproval)
             producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "pii":piiFound,"user":user, "timeStamp":timeStamp}))
-
         except Exception as e:
             print(e)
 

@@ -31,7 +31,8 @@ def main():
             timeStamp = message["timeStamp"]
             user = getUser(piiFound, args.identity_endpoint)
             producer = SqsProcucer(pendinfApproval)
-            producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "pii":piiFound,"user":user, "timeStamp":timeStamp}))
+            res = producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "pii":piiFound,"user":user, "timeStamp":timeStamp}))
+            print(res)
         except Exception as e:
             print(e)
 

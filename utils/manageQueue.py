@@ -88,8 +88,10 @@ class SqsProcucer :
 
         except (NoCredentialsError, PartialCredentialsError):
             log.error("Credentials not available")
+            print("there is missing cred")
         except Exception as e:
             log.error(f"Error: {e}")
+            print(e)
 
 
 def main():

@@ -68,7 +68,7 @@ def process(envelope, args, objKey):
             raise Exception("OWNERIDENTY not found")
         producer = SqsProcucer(url)
         #TODO need the work on the encription on it 
-        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
+        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()), "endUsers":json.dumps({"sender":mailfrom, "recivers":rcpttos}) ,"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
         return 1
 
 

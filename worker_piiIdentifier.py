@@ -1,9 +1,37 @@
 import json
 import os
 import argparse
-import requests
+#import requests
 from utils.manageQueue import SqsConsumer
 from utils.manageQueue import SqsProcucer
+
+
+def mask_text(text):
+    if not text:
+        return ''
+    length = len(text)
+    if length <= 2:  # If text is too short, return it as is
+        return text
+
+    visible_length = max(1, length // 10)  # At least 1 character visible at the start and end
+    if length <= 2 * visible_length:  # If the text is too short for effective masking
+        return text
+
+    start_visible = text[:visible_length]
+    end_visible = text[-visible_length:]
+    masked_part = '*' * (length - 2 * visible_length)
+    return start_visible + masked_part + end_visible
+
+def process_dictionary(input_dict):
+    result = {
+        'message': '',
+        'pii': list(set(input_dict.values()))  # Extract unique values
+    }
+    combined_keys = ''
+    for key, value in input_dict.items():
+        combined_keys+=f" {value}: {mask_text(key)},"
+    result['message']=combined_keys
+    return result
 
 def getUser(piiInformation, endpoint):
     endpoint = endpoint
@@ -33,12 +61,12 @@ def main():
             s3Key = message["s3Key"]
             piiFound = json.loads(message["pii"])
             timeStamp = message["timeStamp"]
-            endUsers = json.loads(message["endUser"])
+            endUsers = json.loads(message["endUsers"])
             user = getUser(piiFound, args.identity_endpoint)
             if not user:
                 sendMessage(messaageID, s3Key, timeStamp, sendSqs)
             producer = SqsProcucer(pendinfApproval)
-            res = producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "endUser":json.dumps(endUsers), "pii":piiFound,"user":user, "timeStamp":timeStamp}))
+            res = producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "endUser":json.dumps(endUsers), "pii":process_dictionary(piiFound),"user":user, "timeStamp":timeStamp}))
             print(pendinfApproval)
         except Exception as e:
             print(e)

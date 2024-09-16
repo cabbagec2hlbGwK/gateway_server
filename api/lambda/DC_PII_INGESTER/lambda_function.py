@@ -143,10 +143,13 @@ class DcDatabase:
             CREATE TABLE {table_name} (
                 messageId VARCHAR(255) PRIMARY KEY, 
                 pii JSON,
+                sender VARCHAR(255),
+                reciver VARCHAR(255),
                 user VARCHAR(255),
                 s3Key VARCHAR(255),
                 userUid VARCHAR(255),
                 approvalState ENUM('approved', 'expired', 'active', 'denied') NOT NULL,
+                hasMessageBeenSent BOOLEAN DEFAULT 0,
                 timeStamp TIMESTAMP
             );
             """
@@ -160,8 +163,8 @@ class DcDatabase:
         res = False
         #approvalState ENUM('approved', 'expired', 'active', 'denied')
         query = f"""
-            INSERT INTO {self.tableName} (messageId, pii, s3Key, timeStamp, approvalState, user,userUid)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO {self.tableName} (messageId, pii, s3Key, timeStamp, approvalState, user,userUid, sender, reciver)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         
         messageId = rawData.get("messageId","None"  )
@@ -169,9 +172,12 @@ class DcDatabase:
         s3Key = rawData.get("s3Key")
         timeStamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(rawData.get("timeStamp")))
         user = json.dumps(rawData.get("user","{}"))
+        endUsers = json.loads(rawData.get("endUser"))
+        sender = endUsers.get("sender")
+        recivers = json.dumps(endUsers.get("reciver"))
         userUid = self.firebaseConnector.getUserUid(json.loads(user))
         
-        data= (messageId, pii, s3Key, timeStamp, "active", user, userUid)
+        data= (messageId, pii, s3Key, timeStamp, "active", user, userUid, sender, recivers)
         print(data)
         
         try:

@@ -1,4 +1,5 @@
 import pyrebase
+import base64
 
 # Firebase configuration
 firebase_config = {
@@ -36,5 +37,6 @@ if __name__ == "__main__":
     password = "test@123"  # Replace with the actual user's password
     
     token = generate_user_token(email, password)
-    print(f"Generated ID token: {token}")
+    db64=base64.b64encode(token.encode())
+    print(db64)
 

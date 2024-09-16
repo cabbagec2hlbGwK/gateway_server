@@ -1,7 +1,7 @@
 import json
 import os
 import argparse
-#import requests
+import requests
 from utils.manageQueue import SqsConsumer
 from utils.manageQueue import SqsProcucer
 

@@ -28,21 +28,32 @@ def get_secret(secret_name):
     return secret
 
 
-def getUpdate(dbConnector):
+def getUpdate(dbConnector, producer):
     data = dbConnector.getApprovedMessage()
     for value in data:
-        print(value)
+        messageId = value[0]
+        timeStamp = value[1]
+        objKey = value[2]
+        try:
+            producer.send_message(json.dumps({"messageId":messageId,"s3Key":objKey, "time":timeStamp}))
+            dbConnector.tagMessageSent(messageId)
+            print("created")
+            print(value)
+        except Exception as e:
+            print(e)
 
 
 
 
 def main():
+    url = os.getenv("SENDSQSURL","")
+    pro = SqsProcucer(url)
     secretName = os.getenv("secret_name")
     rdsEndpoint = os.getenv("rds_endpoint")
     tableN = os.getenv("tableName")
     rdsSec = json.loads(get_secret(secretName))
     db = DcDatabase(secret=rdsSec, endpoint=rdsEndpoint, dbName="test1",firebaseConnector=None, dbTableName=tableN)
-    getUpdate(db)
+    getUpdate(db, pro)
     
 
 

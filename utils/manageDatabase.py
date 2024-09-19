@@ -69,7 +69,7 @@ class DcDatabase:
         rows = []
         try:
             with self.connection.cursor() as cursor:
-                query = f"SELECT messageId, timeStamp, s3Key FROM {self.tableName} WHERE approvalState = approved AND hasMessageBeenSent = 0"
+                query = f"SELECT messageId, timeStamp, s3Key FROM {self.tableName} WHERE approvalState = 'approved' AND hasMessageBeenSent = 0"
                 cursor.execute(query)
                 rows = cursor.fetchall()
         except Exception as e:

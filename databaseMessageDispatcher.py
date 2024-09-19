@@ -35,7 +35,7 @@ def getUpdate(dbConnector, producer):
         timeStamp = value[1]
         objKey = value[2]
         try:
-            producer.send_message(json.dumps({"messageId":messageId,"s3Key":objKey, "time":timeStamp}))
+            producer.send_message(json.dumps({"messageId":messageId,"s3Key":objKey, "time":json.dumps(timeStamp)}))
             dbConnector.tagMessageSent(messageId)
             print("created")
             print(value)

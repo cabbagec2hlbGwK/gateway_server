@@ -53,8 +53,10 @@ def main():
     tableN = os.getenv("tableName")
     rdsSec = json.loads(get_secret(secretName))
     db = DcDatabase(secret=rdsSec, endpoint=rdsEndpoint, dbName="test1",firebaseConnector=None, dbTableName=tableN)
-    getUpdate(db, pro)
-    db.connection.commit()
+    while True:
+        time.sleep(2):
+        getUpdate(db, pro)
+        db.connection.commit()
     
 
 

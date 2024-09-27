@@ -6,6 +6,8 @@ import subprocess
 import smtplib
 import json
 import uuid
+import signal
+import sys
 from datetime import datetime
 from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
@@ -60,13 +62,26 @@ class ControllerStarttls(Controller):
     def factory(self):
         return SMTP(self.handler, require_starttls=True, tls_context=context)
 
+def signal_handler(sig, frame):
+    log.info('Received signal to stop. Stopping the server...')
+    controller.stop()
+    sys.exit(0)
 
 
 #---------------------------------runner---------------------------------------
 if __name__ == "__main__":
     controller = ControllerStarttls(MessageHandler(), port=args.port,  hostname=args.ip)
     controller.start()
-    log.info('Running STARTTLS server. Press enter to stop.')
-    input()
+    log.info('Running STARTTLS server. Press Ctrl+C to stop.')
+    signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
+    signal.signal(signal.SIGTERM, signal_handler)  # Handle termination signal
+    # Instead of input(), you can use a loop to keep the script alive
+    while True:
+        try:
+            pass
+        except Exception as e:
+            log.error(f'An error occurred: {e}')
+            break
+
     controller.stop()
     

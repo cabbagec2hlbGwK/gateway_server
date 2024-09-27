@@ -14,13 +14,19 @@ from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
 
 def extract_docx(data):
-    unique_filename = f"temp_{uuid.uuid4()}.docx"
-    with open(unique_filename, "wb") as temp_docx:
+    unique_docx_filename = f"temp_{uuid.uuid4()}.docx"
+    unique_pdf_filename = f"temp_{uuid.uuid4()}.pdf"
+
+    with open(unique_docx_filename, "wb") as temp_docx:
         temp_docx.write(data)
 
-    pdf_bytes = pypandoc.convert_file(unique_filename, 'pdf', outputfile=None)
+    pypandoc.convert_file(unique_docx_filename, 'pdf', outputfile=unique_pdf_filename)
 
-    os.remove(unique_filename)
+    with open(unique_pdf_filename, "rb") as temp_pdf:
+        pdf_bytes = temp_pdf.read()
+
+    os.remove(unique_docx_filename)
+    os.remove(unique_pdf_filename)
 
     return pdf_bytes
 

@@ -3,6 +3,8 @@ import uuid
 import logging
 import base64
 import os
+import io
+import pandas as pd
 import argparse
 import pypandoc
 import json
@@ -29,6 +31,17 @@ def extract_docx(data):
     os.remove(unique_pdf_filename)
 
     return pdf_bytes
+
+
+def extract_excel_to_csv(data):
+    excel_buffer = io.BytesIO(data)
+    df = pd.read_excel(excel_buffer)
+    
+    csv_buffer = io.StringIO()
+    df.to_csv(csv_buffer, index=False)
+    
+    csv_text = csv_buffer.getvalue()
+    return csv_text
 
 def process(envelope, args, objKey):
     mailfrom = envelope.mail_from
@@ -72,6 +85,12 @@ def process(envelope, args, objKey):
             log.debug(res.text)
             text += res.text
             print(text)
+        if 'xlsx' in metadata[1]:
+            rawBits = base64.b64decode(attachment.get_payload())
+            text += extract_excel_to_csv(rawBits)
+            print(text)
+            input()
+            
 
         if 'text' in attachment:
             print(emailMess)

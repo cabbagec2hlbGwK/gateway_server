@@ -64,7 +64,7 @@ def process(envelope, args, objKey):
     for attachment in attachments:
         metadata = attachment.get("Content-Type").split(";")
         print("------------------")
-        if any(str(metadata[1]).lower() in str(value).lower() for value in keywords):
+        if any(keyword in item.lower() for item in metadata for keyword in keywords):
             print("this is runnin  --------------------------*")
             contentType = metadata[0].strip()
             name = metadata[1].split("=")[1].replace('"','').strip()

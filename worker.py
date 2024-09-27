@@ -64,7 +64,7 @@ def process(envelope, args, objKey):
     for attachment in attachments:
         metadata = attachment.get("Content-Type").split(";")
         print("------------------")
-        if any(keyword in item.lower() for item in metadata for keyword in keywords):
+        if any(str(metadata[1]).lower() in str(value).lower() for value in keywords):
             print("this is runnin  --------------------------*")
             contentType = metadata[0].strip()
             name = metadata[1].split("=")[1].replace('"','').strip()
@@ -90,8 +90,6 @@ def process(envelope, args, objKey):
             text += extract_excel_to_csv(rawBits)
             print(text)
             input()
-            
-
         if 'text' in attachment:
             print(emailMess)
             text += str(attachment) 

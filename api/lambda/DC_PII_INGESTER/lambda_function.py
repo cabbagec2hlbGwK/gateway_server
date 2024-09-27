@@ -174,7 +174,7 @@ class DcDatabase:
         user = json.dumps(rawData.get("user","{}"))
         endUsers = json.loads(rawData.get("endUser"))
         sender = endUsers.get("sender")
-        recivers = json.dumps(endUsers.get("reciver"))
+        recivers = endUsers.get("recivers")
         userUid = self.firebaseConnector.getUserUid(json.loads(user))
         
         data= (messageId, pii, s3Key, timeStamp, "active", user, userUid, sender, recivers)
@@ -259,4 +259,3 @@ def lambda_handler(event, context):
         fb.close()
         print(e)
         
-

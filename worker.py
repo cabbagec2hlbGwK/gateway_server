@@ -4,6 +4,7 @@ import logging
 import base64
 import os
 import argparse
+import pypandoc
 import json
 import time
 from email import message_from_bytes
@@ -11,6 +12,17 @@ from email.policy import default
 from utils.manageS3 import S3Manage
 from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
+
+def extract_docx(data):
+    unique_filename = f"temp_{uuid.uuid4()}.docx"
+    with open(unique_filename, "wb") as temp_docx:
+        temp_docx.write(data)
+
+    pdf_bytes = pypandoc.convert_file(unique_filename, 'pdf', outputfile=None)
+
+    os.remove(unique_filename)
+
+    return pdf_bytes
 
 def process(envelope, args, objKey):
     mailfrom = envelope.mail_from
@@ -43,6 +55,18 @@ def process(envelope, args, objKey):
             res = requests.post(url, files=files)
             log.debug(res.text)
             text += res.text
+        if 'docx' in metadata[1] or 'dox' in metadata[1]:
+            contentType = 'application/pdf'
+            name = metadata[1].split("=")[1].replace('"','').strip().replace(".docx", ".pdf").replace(".dox",".pdf")
+            rawBits = base64.b64decode(attachment.get_payload())
+            rawBits = extract_docx(rawBits)
+            files =  {'test': (name, rawBits, contentType)}
+            url = f"http://{args.api}:5000/extract"
+            res = requests.post(url, files=files)
+            log.debug(res.text)
+            text += res.text
+            print(text)
+
         if 'text' in attachment:
             print(emailMess)
             text += str(attachment) 

@@ -88,20 +88,15 @@ def process(envelope, args, objKey):
         if 'xlsx' in metadata[1]:
             rawBits = base64.b64decode(attachment.get_payload())
             text += extract_excel_to_csv(rawBits)
-            print(text)
         if 'text' in attachment:
-            print(emailMess)
             text += str(attachment) 
-    print(text)
     url = f"http://{args.api}:5000/detect"
     res = requests.post(url, json={"text":text+str(emailMess)})
-    print(res.text)
     piiFound = set()
     jres = json.loads(res.text.replace("'",'"'))
 
     for i in jres:
         piiFound.add(jres[i])
-    print(piiFound)
     if len(piiFound) ==0:
         url = os.getenv("SENDSQSURL","")
         procucer = SqsProcucer(url)

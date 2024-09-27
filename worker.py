@@ -89,7 +89,6 @@ def process(envelope, args, objKey):
             rawBits = base64.b64decode(attachment.get_payload())
             text += extract_excel_to_csv(rawBits)
             print(text)
-            input()
         if 'text' in attachment:
             print(emailMess)
             text += str(attachment) 

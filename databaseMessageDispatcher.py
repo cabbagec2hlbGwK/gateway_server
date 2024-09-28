@@ -52,11 +52,12 @@ def main():
     rdsEndpoint = os.getenv("rds_endpoint")
     tableN = os.getenv("tableName")
     rdsSec = json.loads(get_secret(secretName))
-    db = DcDatabase(secret=rdsSec, endpoint=rdsEndpoint, dbName="test1",firebaseConnector=None, dbTableName=tableN)
     while True:
+        db = DcDatabase(secret=rdsSec, endpoint=rdsEndpoint, dbName="test1",firebaseConnector=None, dbTableName=tableN)
         time.sleep(2)
         getUpdate(db, pro)
         db.connection.commit()
+        del db
     
 
 

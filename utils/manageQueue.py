@@ -23,7 +23,7 @@ class SqsConsumer:
         if not message:
             print("no message found")
             return
-        logging.info(f"Processing message: {message['Body']}")
+        log.info(f"Processing message: {message['Body']}")
         self.processFunction(json.loads(message['Body']))
 
     def consume_messages(self):

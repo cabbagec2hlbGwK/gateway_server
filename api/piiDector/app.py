@@ -98,7 +98,7 @@ def extract_card_info(text):
         print(len(data))
         if data == []:
             pass
-            return matches
+            return swap_dict(matches)
         for card_number in data:
             for name, pattern in patterns.items():
                 if re.fullmatch(pattern, card_number) and cardCheck(card_number):

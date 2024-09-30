@@ -66,7 +66,6 @@ def main():
                 sendMessage(messaageID, s3Key, timeStamp, sendSqs)
             producer = SqsProcucer(pendinfApproval)
             res = producer.send_message(json.dumps({"messageId":messaageID, "s3Key": s3Key, "endUser":json.dumps(endUsers), "pii":process_dictionary(piiFound),"user":user, "timeStamp":timeStamp}))
-            print(pendinfApproval)
         except Exception as e:
             print(e)
 

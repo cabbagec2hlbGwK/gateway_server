@@ -53,7 +53,6 @@ def main():
 
     consumer = SqsConsumer(piiQueue)
 
-        #producer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
     @consumer.process
     def handel_event(message):
         try:

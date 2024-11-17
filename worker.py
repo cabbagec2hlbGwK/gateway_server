@@ -15,6 +15,30 @@ from utils.manageS3 import S3Manage
 from utils.manageQueue import SqsConsumer, SqsProcucer
 log = logging.getLogger("worker_task")
 
+
+#--------------------------
+DLP_POLICY = json.load(open("pollicy.json","r"))
+blacklist_sender, blacklist_receiver = DLP_POLICY['user']['blackList'].get('senderList', []), DLP_POLICY['user']['blackList'].get('receiverList', [])
+whitelist_sender, whitelist_receiver = DLP_POLICY['user']['whiteList'].get('senderList', []), DLP_POLICY['user']['whiteList'].get('receiverList', [])
+pii_not_present_default = DLP_POLICY['message']['messageType']['piiNotPresent'].get('default')
+user_is_registered_default = DLP_POLICY['message']['userType']['userIsRegistered'].get('default')
+user_not_registered_default = DLP_POLICY['message']['userType']['userNotRegistered'].get('default')
+pii_list = DLP_POLICY.get('pii', [])
+
+def isWhitelistUser(user):
+    for email in whitelist_receiver + whitelist_sender:
+        if user == email :
+            return True
+    return False
+
+def isBlacklistUser(user):
+    for email in blacklist_receiver + blacklist_sender:
+        if user == email :
+            return True
+    return False
+
+#--------------------------
+
 def extract_docx(data):
     unique_docx_filename = f"temp_{uuid.uuid4()}.docx"
     unique_pdf_filename = f"temp_{uuid.uuid4()}.pdf"
@@ -97,11 +121,14 @@ def process(envelope, args, objKey):
 
     for i in jres:
         piiFound.add(jres[i])
-    if len(piiFound) ==0:
+    if len(piiFound) ==0 or isWhitelistUser(mailfrom) or isWhitelistUser("".join(rcpttos)):
         url = os.getenv("SENDSQSURL","")
         procucer = SqsProcucer(url)
         procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
         print("created")
+        return 0
+    if isBlacklistUser(mailfrom) or isBlacklistUser("".join(rcpttos)):
+        print("the message was proped as it was blacklisted")
         return 0
     else:
         url = os.getenv("OWNERIDENTY","")

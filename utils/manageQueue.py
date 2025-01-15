@@ -34,8 +34,8 @@ class SqsConsumer:
                     AttributeNames=['All'],
                     MaxNumberOfMessages=10,
                     MessageAttributeNames=['All'],
-                    VisibilityTimeout=60,  # Seconds
-                    WaitTimeSeconds=20  # Long polling
+                    VisibilityTimeout=300,  # Seconds
+                    WaitTimeSeconds=3  # Long polling
                 )
 
                 messages = response.get('Messages', [])

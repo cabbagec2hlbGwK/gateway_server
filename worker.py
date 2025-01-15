@@ -214,7 +214,21 @@ def process(envelope, args, objKey):
         print("the message was proped as it was blacklisted")
         return 0
     else:
-        sendUpdate(reciver=mailfrom , message=f"The email to {rcpttos} has been blocked due to privacy related issue please check if the email has any PII information \nThe email is either in pending state waiting for approval\n\n---------------------------\n\n{piiFound}")
+        blockMessage = f"""
+        Subject: Action Required: Email Blocked Due to Privacy Concerns
+
+        Dear {",".join(mailfrom)}
+
+        We wanted to inform you that your email to {rcpttos} has been blocked due to a privacy-related issue. Please review the content of your message to ensure it does not contain any Personally Identifiable Information (PII).
+
+        At this time, the email is in a pending state and awaiting approval.
+
+        Thank you for your attention to this matter. If you need further assistance, please don't hesitate to reach out to our support team.
+
+        Best regards,
+        DigiControl Team
+        """
+        sendUpdate(reciver=mailfrom , message=blockMessage)
         url = os.getenv("OWNERIDENTY","")
         if not url:
             raise Exception("OWNERIDENTY not found")

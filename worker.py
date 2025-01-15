@@ -69,7 +69,18 @@ def createEnvelope(sender, receivers, message):
         # If multiple receivers, ensure it's a list
         envelope.rcpt_tos = receivers
     # Encode the message to bytes, as Envelope.content should be bytes
+    lines = [
+        f"From: {sender}",
+        f"To: {', '.join(receivers)}",
+        f"Subject: 'DigiControl Privacy Monitoring'",
+        "",  # Blank line between headers and body
+        message
+    ]
+    
+    # Join lines into a single string and encode to bytes
+    message = "\n".join(lines)
     envelope.content = message.encode('utf-8')
+    return envelope
     return envelope
 
 def extract_excel_to_csv(data):
@@ -156,7 +167,6 @@ def process(envelope, args, objKey):
     for i in jres:
         piiFound.add(jres[i])
     if len(piiFound) ==0 or isWhitelistUser(mailfrom) or isWhitelistUser("".join(rcpttos)):
-        sendUpdate(reciver="earth@brokencosmos.com", message="this is a test email")
         url = os.getenv("SENDSQSURL","")
         procucer = SqsProcucer(url)
         procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
@@ -167,6 +177,7 @@ def process(envelope, args, objKey):
         print("the message was proped as it was blacklisted")
         return 0
     else:
+        sendUpdate(reciver=mailfrom , message="The email to {} has been blocked due to privacy related issue please check if the email has any PII information \nThe email is either in pending state waiting for approval")
         url = os.getenv("OWNERIDENTY","")
         if not url:
             raise Exception("OWNERIDENTY not found")

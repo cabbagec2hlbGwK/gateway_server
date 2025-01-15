@@ -3,14 +3,14 @@ import base64
 
 # Firebase configuration
 firebase_config = {
-    "apiKey": "AIzaSyC_toR8GM7k78fcEGl4lRgvAAQ2fS9zlQc",
-    "authDomain": "digicontrol-ca3b7.firebaseapp.com",
-    "projectId": "digicontrol-ca3b7",
-    "storageBucket": "digicontrol-ca3b7.appspot.com",
-    "messagingSenderId": "918916989686",
-    "appId": "1:918916989686:web:ea82cb1d634bc8ea6fa2d7",
-    "measurementId": "G-KS9TGY0KSH",
-    "databaseURL": ""  # Add database URL if you're using Firebase database
+  "apiKey": "AIzaSyDVu8qSt4iNzWi0QOPkLy1F0Dz-7hB376s",
+  "authDomain": "digicontrol-emailmonitoring.firebaseapp.com",
+  "projectId": "digicontrol-emailmonitoring",
+  "storageBucket": "digicontrol-emailmonitoring.firebasestorage.app",
+  "messagingSenderId": "772360059568",
+  "appId": "1:772360059568:web:80a0352225064adcd75975",
+  "measurementId": "G-CKWVRBZR8E",
+  "databaseURL":""
 }
 
 # Initialize Firebase
@@ -33,7 +33,7 @@ def generate_user_token(email, password):
 
 # Example usage
 if __name__ == "__main__":
-    email = "test@test.ca"  # Replace with the actual user's email
+    email = "test@user.com"  # Replace with the actual user's email
     password = "test@123"  # Replace with the actual user's password
     
     token = generate_user_token(email, password)

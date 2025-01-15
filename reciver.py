@@ -11,6 +11,7 @@ import sys
 from datetime import datetime
 from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
+from email.policy import compat32
 from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage
@@ -35,10 +36,38 @@ if not os.path.exists(f'cert/{os.path.sep}cert.pem') and not os.path.exists(f'ce
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 context.load_cert_chain(f'cert{os.path.sep}cert.pem', f'cert{os.path.sep}key.pem')
 
+def modifyEmailHeader(envelope):
+    tokenHeader = "X-TOKEN"
+    message = message_from_bytes(envelope.content, policy=compat32)
+
+    if tokenHeader in message:
+        log.debug(f"Original '{tokenHeader}' header: {message[tokenHeader]}")
+        message.replace_header(tokenHeader, "CHECKED")
+        log.debug(f"Modified '{tokenHeader}' header: {message[tokenHeader]}")
+    else:
+        log.debug(f"Header '{tokenHeader}' not found. Adding it.")
+        message[tokenHeader] = "CHECKED"
+    envelope.content = message.as_bytes(policy=compat32)
+    return envelope
+
+def verifyEmail(envelope):
+    dcToken = os.getenv("DC_TOKEN","NULL")
+    tokenHeader = "X-TOKEN"
+    message = message_from_bytes(envelope.content, policy=compat32)
+
+    if tokenHeader in message:
+        log.debug(f"Original '{tokenHeader}' header: {message[tokenHeader]}")
+        if dcToken in message[tokenHeader]:
+            return True
+        else:
+            return False
+    else:
+        return False
 #------------------------------------------------------------------------------
 
 class MessageHandler:
     async def handle_DATA(self, server, session, envelope):
+        print(f"The email is valid:{verifyEmail(envelope)}")
         key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
         bucketName = os.getenv("S3BUCKET","testbbuckker12")
         s3Manager = S3Manage(key, bucketName)

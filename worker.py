@@ -84,7 +84,7 @@ def process(envelope, args, objKey):
 
     text = ""
     keywords = ['png','jpeg','pdf']
-    print(len(attachments))
+    print(attachments)
     for attachment in attachments:
         metadata = attachment.get("Content-Type").split(";")
         print("------------------")

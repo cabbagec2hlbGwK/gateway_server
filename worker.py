@@ -72,7 +72,7 @@ def createEnvelope(sender, receivers, message):
     lines = [
         f"From: {sender}",
         f"To: {receivers}",
-        f"Subject: 'DigiControl Privacy Monitoring'",
+        f"Subject: DigiControl Privacy Monitoring",
         "",  # Blank line between headers and body
         message
     ]

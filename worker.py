@@ -41,7 +41,7 @@ def isBlacklistUser(user):
 
 #--------------------------
 
-def extract_docx(data):
+def extract_docx1(data):
     unique_docx_filename = f"temp_{uuid.uuid4()}.docx"
     unique_pdf_filename = f"temp_{uuid.uuid4()}.pdf"
 
@@ -58,6 +58,39 @@ def extract_docx(data):
 
     return pdf_bytes
 
+def extract_docx(data):
+    try:
+        # Method 1: Try direct conversion to plain text
+        unique_docx_filename = f"temp_{uuid.uuid4()}.docx"
+        with open(unique_docx_filename, "wb") as temp_docx:
+            temp_docx.write(data)
+
+        # Convert to plain text instead of PDF
+        text = pypandoc.convert_file(unique_docx_filename, 'plain', format='docx')
+        
+        # Clean up
+        os.remove(unique_docx_filename)
+        
+        return text  # Return as bytes to maintain consistency
+
+    except Exception as e:
+        log.error(f"Error in DOCX conversion: {str(e)}")
+        try:
+            # Method 2: Alternative conversion using python-docx
+            from docx import Document
+            from io import BytesIO
+            
+            doc = Document(BytesIO(data))
+            full_text = []
+            for para in doc.paragraphs:
+                full_text.append(para.text)
+            
+            return '\n'.join(full_text)
+
+        except Exception as e2:
+            log.error(f"Both conversion methods failed: {str(e2)}")
+            # If both methods fail, return empty content
+            return ""
 
 def createEnvelope(sender, receivers, message):
     envelope = Envelope()
@@ -149,13 +182,15 @@ def process(envelope, args, objKey):
             contentType = 'application/pdf'
             name = metadata[1].split("=")[1].replace('"','').strip().replace(".docx", ".pdf").replace(".dox",".pdf")
             rawBits = base64.b64decode(attachment.get_payload())
-            rawBits = extract_docx(rawBits)
-            files =  {'test': (name, rawBits, contentType)}
-            url = f"http://{args.api}:5000/extract"
-            res = requests.post(url, files=files)
-            log.debug(res.text)
-            text += res.text
-            print(text)
+            try:
+                rawBits = extract_docx1(rawBits)
+                files =  {'test': (name, rawBits, contentType)}
+                url = f"http://{args.api}:5000/extract"
+                res = requests.post(url, files=files)
+                log.debug(res.text)
+                text += res.text
+            except Exception as e:
+                text += extract_docx(rawBits)
         if 'xlsx' in metadata[1]:
             rawBits = base64.b64decode(attachment.get_payload())
             text += extract_excel_to_csv(rawBits)

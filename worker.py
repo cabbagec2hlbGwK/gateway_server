@@ -9,6 +9,7 @@ import argparse
 import pypandoc
 import json
 import time
+from aiosmtpd.smtp import Envelope
 from email import message_from_bytes
 from email.policy import default
 from utils.manageS3 import S3Manage
@@ -56,6 +57,19 @@ def extract_docx(data):
 
     return pdf_bytes
 
+
+def create_envelope(sender, receivers, message):
+    envelope = Envelope()
+    envelope.mail_from = sender
+    if isinstance(receivers, str):
+        # If a single receiver is provided as a string, convert it to a list
+        envelope.rcpt_tos = [receivers]
+    else:
+        # If multiple receivers, ensure it's a list
+        envelope.rcpt_tos = receivers
+    # Encode the message to bytes, as Envelope.content should be bytes
+    envelope.content = message.encode('utf-8')
+    return envelope
 
 def extract_excel_to_csv(data):
     excel_buffer = io.BytesIO(data)

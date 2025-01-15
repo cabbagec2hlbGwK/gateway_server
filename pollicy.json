@@ -63,7 +63,7 @@
         "whiteList": {
             "description": "All the emails defined here will bypass the scanning for PII.",
             "senderList": [
-                "earth@brokencosmos.com"
+                "earth1@brokencosmos.com"
             ],
             "receiverList": [
                 "husky@duck.com"

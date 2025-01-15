@@ -34,7 +34,7 @@ class SqsConsumer:
                     AttributeNames=['All'],
                     MaxNumberOfMessages=10,
                     MessageAttributeNames=['All'],
-                    VisibilityTimeout=300,  # Seconds
+                    VisibilityTimeout=60,  # Seconds
                     WaitTimeSeconds=20  # Long polling
                 )
 

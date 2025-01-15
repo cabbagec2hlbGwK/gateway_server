@@ -179,7 +179,7 @@ def process(envelope, args, objKey):
         print("the message was proped as it was blacklisted")
         return 0
     else:
-        sendUpdate(reciver=mailfrom , message=f"The email to {rcpttos} has been blocked due to privacy related issue please check if the email has any PII information \nThe email is either in pending state waiting for approval\n\n---------------------------\n\n{piiFound}")
+        sendUpdate(reciver=mailfrom , message=f"The email to {rcpttos} has been blocked due to privacy related issue please check if the email has any PII information \nThe email is either in pending state waiting for approval\n\n---------------------------\n\n{json.dumps(piiFound)}")
         url = os.getenv("OWNERIDENTY","")
         if not url:
             raise Exception("OWNERIDENTY not found")

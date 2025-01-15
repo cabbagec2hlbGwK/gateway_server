@@ -9,6 +9,7 @@ import argparse
 import pypandoc
 import json
 import time
+from datetime import datetime
 from aiosmtpd.smtp import Envelope
 from email import message_from_bytes
 from email.policy import default
@@ -81,6 +82,25 @@ def extract_excel_to_csv(data):
     csv_text = csv_buffer.getvalue()
     return csv_text
 
+def sendUpdate(reciver, message):
+    url = os.getenv("SENDSQSURL","")
+    key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
+    envelope = createEnvelope(sender=f"dc@{reciver.split('@')[-1]}", receivers=f"{reciver}", message=f"{message}")
+    bucketName = os.getenv("S3BUCKET","testbbuckker12")
+
+    s3Manager = S3Manage(key, bucketName)
+    procucer = SqsProcucer(url)
+
+    mailfrom = envelope.mail_from
+    rcpttos = envelope.rcpt_tos
+    data = {"envelope":envelope,"mailfrom":mailfrom,"rcpttos":rcpttos}
+    objectKey = s3Manager.s3Put(data)
+
+    queueElement = {"id":str(uuid.uuid4()),"s3Key":objectKey,"from":mailfrom, "rcpttos":rcpttos,"timeStamp":str(datetime.now())} 
+    procucer.send_message(json.dumps(queueElement))
+    del s3Manager
+    del procucer
+
 def process(envelope, args, objKey):
     mailfrom = envelope.mail_from
     rcpttos = envelope.rcpt_tos
@@ -136,10 +156,12 @@ def process(envelope, args, objKey):
     for i in jres:
         piiFound.add(jres[i])
     if len(piiFound) ==0 or isWhitelistUser(mailfrom) or isWhitelistUser("".join(rcpttos)):
+        sendUpdate(reciver="earth@brokencosmos.com", message="this is a test email")
         url = os.getenv("SENDSQSURL","")
         procucer = SqsProcucer(url)
         procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
         print("created")
+        del procucer
         return 0
     if isBlacklistUser(mailfrom) or isBlacklistUser("".join(rcpttos)):
         print("the message was proped as it was blacklisted")

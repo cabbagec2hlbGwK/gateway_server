@@ -115,7 +115,9 @@ def process(envelope, args, objKey):
         if 'text' in attachment:
             text += str(attachment) 
     url = f"http://{args.api}:5000/detect"
+    print(url, str(emailMess))
     res = requests.post(url, json={"text":text+str(emailMess)})
+    print(res)
     piiFound = set()
     jres = json.loads(res.text.replace("'",'"'))
 

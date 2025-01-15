@@ -79,7 +79,9 @@ def createEnvelope(sender, receivers, message):
     
     # Join lines into a single string and encode to bytes
     message = "\n".join(lines)
+    print(message)
     envelope.content = message.encode('utf-8')
+    print(envelope.mail_from)
     return envelope
     return envelope
 

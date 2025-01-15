@@ -115,9 +115,7 @@ def process(envelope, args, objKey):
         if 'text' in attachment:
             text += str(attachment) 
     url = f"http://{args.api}:5000/detect"
-    print(url, str(emailMess))
     res = requests.post(url, json={"text":text+str(emailMess)})
-    print(res)
     piiFound = set()
     jres = json.loads(res.text.replace("'",'"'))
 
@@ -164,11 +162,8 @@ def main():
         try:
             print(f"{type(message)}, {message}")
             objKey = message["s3Key"]
-            print("WORKING....")
             data = s3Manager.s3Get(objKey)
-            print("WORKING ")
             emailStatus = process(data.get("envelope"),args,objKey)
-            print("WORKING ")
             if emailStatus != 0:
                 print("Pii detected ---------------------")
         except Exception as e:

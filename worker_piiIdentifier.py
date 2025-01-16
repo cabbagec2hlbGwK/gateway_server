@@ -2,6 +2,7 @@ import json
 import os
 import argparse
 import requests
+from datetime import datetime
 from utils.manageQueue import SqsConsumer
 from utils.manageQueue import SqsProcucer
 
@@ -48,7 +49,7 @@ def getUser(piiInformation, endpoint):
     return userJson.get('user',"Null")
 def sendMessage(messageId, s3Key, timeStamp,sqs):
     procucer = SqsProcucer(sqs)
-    procucer.send_message(json.dumps({"messageId":str(messageId),"s3Key":s3Key, "time":str(time.time)}))
+    procucer.send_message(json.dumps({"messageId":str(messageId),"s3Key":s3Key, "time":str(datetime.now())}))
     print("created")
 
 def main():

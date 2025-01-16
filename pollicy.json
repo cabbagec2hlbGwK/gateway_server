@@ -37,7 +37,7 @@
                 "post": "userNotification"
             },
             "userNotRegistered": {
-                "default": "reject",
+                "default": "approve",# or approve/reject
                 "identity": "none",
                 "post": [
                     "userCreation",

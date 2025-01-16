@@ -62,6 +62,8 @@ def main():
             timeStamp = message["timeStamp"]
             endUsers = json.loads(message["endUsers"])
             user = getUser(piiFound, args.identity_endpoint)
+            print(user)
+            print("-----------------")
             if not user:
                 sendMessage(messaageID, s3Key, timeStamp, sendSqs)
             producer = SqsProcucer(pendinfApproval)

@@ -112,9 +112,7 @@ def createEnvelope(sender, receivers, message):
     
     # Join lines into a single string and encode to bytes
     message = "\n".join(lines)
-    print(message)
     envelope.content = message.encode('utf-8')
-    print(envelope.mail_from)
     return envelope
     return envelope
 
@@ -241,8 +239,6 @@ def main():
     parser = argparse.ArgumentParser(description="worker handels the task of processing the information from the queue")
     parser.add_argument("--api", required=True) 
     args = parser.parse_args()
-    envelope = createEnvelope(sender="dc@brokencosmos.com", receivers="asherjamesmkt@gmail.com", message="this is a test email")
-    print(envelope)
 
     key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
     bucketName = os.getenv("S3BUCKET","testbbuckker12")

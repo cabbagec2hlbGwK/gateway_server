@@ -48,7 +48,9 @@ class SqsConsumer:
 
                 for message in messages:
                     try:
-                        if self.process_message(message):
+                        isComplete = self.process_message(message)
+                        print(isComplete)
+                        if isComplete:
                             print("Message was successfully cleared")
                             self.sqs.delete_message(
                                 QueueUrl=self.sqsUrl,

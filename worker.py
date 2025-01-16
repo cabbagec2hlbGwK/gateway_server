@@ -215,18 +215,18 @@ def process(envelope, args, objKey):
         return 0
     else:
         blockMessage = f"""
-        Subject: Action Required: Email Blocked Due to Privacy Concerns
+Subject: Action Required: Email Blocked Due to Privacy Concerns
 
-        Dear {",".join(mailfrom)}
+Dear {mailfrom}
 
-        We wanted to inform you that your email to {rcpttos} has been blocked due to a privacy-related issue. Please review the content of your message to ensure it does not contain any Personally Identifiable Information (PII).
+We wanted to inform you that your email to {rcpttos} has been blocked due to a privacy-related issue. Please review the content of your message to ensure it does not contain any Personally Identifiable Information (PII).
 
-        At this time, the email is in a pending state and awaiting approval.
+At this time, the email is in a pending state and awaiting approval.
 
-        Thank you for your attention to this matter. If you need further assistance, please don't hesitate to reach out to our support team.
+Thank you for your attention to this matter. If you need further assistance, please don't hesitate to reach out to our support team.
 
-        Best regards,
-        DigiControl Team
+Best regards,
+DigiControl Team
         """
         sendUpdate(reciver=mailfrom , message=blockMessage)
         url = os.getenv("OWNERIDENTY","")

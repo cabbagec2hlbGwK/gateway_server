@@ -42,7 +42,7 @@
                 "supportedValues":[
                     "approve",
                     "reject"
-                ]
+                ],
                 "post": [
                     "userCreation",
                     "rejectEmail",

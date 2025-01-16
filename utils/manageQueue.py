@@ -48,10 +48,12 @@ class SqsConsumer:
                 for message in messages:
                     try:
                         if self.process_message(message):
+                            print("Message was successfully cleared")
                             self.sqs.delete_message(
                                 QueueUrl=self.sqsUrl,
                                 ReceiptHandle=message['ReceiptHandle']
                             )
+                            print("Message was uncessfull cleared")
                             log.info(f"Deleted message: {message['MessageId']}")
 
                     except Exception as e:

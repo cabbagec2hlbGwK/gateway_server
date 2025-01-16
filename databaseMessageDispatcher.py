@@ -51,8 +51,9 @@ def main():
     secretName = os.getenv("secret_name")
     rdsEndpoint = os.getenv("rds_endpoint")
     tableN = os.getenv("tableName")
+    databaseName = os.getenv("DATABASENAME")
     rdsSec = json.loads(get_secret(secretName))
-    db = DcDatabase(secret=rdsSec, endpoint=rdsEndpoint, dbName="test1",firebaseConnector=None, dbTableName=tableN)
+    db = DcDatabase(secret=rdsSec, endpoint=rdsEndpoint, dbName=databaseName,firebaseConnector=None, dbTableName=tableN)
     while True:
         time.sleep(2)
         getUpdate(db, pro)

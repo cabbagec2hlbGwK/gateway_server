@@ -47,13 +47,12 @@ class SqsConsumer:
 
                 for message in messages:
                     try:
-                        self.process_message(message)
-
-                        self.sqs.delete_message(
-                            QueueUrl=self.sqsUrl,
-                            ReceiptHandle=message['ReceiptHandle']
-                        )
-                        log.info(f"Deleted message: {message['MessageId']}")
+                        if self.process_message(message):
+                            self.sqs.delete_message(
+                                QueueUrl=self.sqsUrl,
+                                ReceiptHandle=message['ReceiptHandle']
+                            )
+                            log.info(f"Deleted message: {message['MessageId']}")
 
                     except Exception as e:
                         log.error(f"Error processing message: {e}")

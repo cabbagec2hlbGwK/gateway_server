@@ -36,8 +36,10 @@ def main():
             objKey = message["s3Key"]
             data = s3Manager.s3Get(objKey)
             sender(data.get("envelope"))
+            return True
         except Exception as e:
             print(e)
+            return False
 
     consumer.consume_messages()
 

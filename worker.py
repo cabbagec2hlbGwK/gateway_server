@@ -260,6 +260,7 @@ def main():
             emailStatus = process(data.get("envelope"),args,objKey)
             if emailStatus != 0:
                 print("Pii detected ---------------------")
+            return True
         except Exception as e:
             print(e)
 

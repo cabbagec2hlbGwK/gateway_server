@@ -215,9 +215,7 @@ def process(envelope, args, objKey):
         return 0
     else:
         blockMessage = f"""
-Subject: Action Required: Email Blocked Due to Privacy Concerns
-
-Dear {mailfrom}
+Dear {mailfrom.split("@")[0]}
 
 We wanted to inform you that your email to {rcpttos} has been blocked due to a privacy-related issue. Please review the content of your message to ensure it does not contain any Personally Identifiable Information (PII).
 

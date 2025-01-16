@@ -18,6 +18,7 @@ class SqsConsumer:
 
     def process(self,f):
         self.processFunction = f
+        return f
 
     def process_message(self, message):
         if not message:

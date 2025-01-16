@@ -47,8 +47,8 @@ def getUser(piiInformation, endpoint):
     userJson = json.loads(user.content)
     return userJson.get('user',"Null")
 def sendMessage(messageId, s3Key, timeStamp,sqs):
-    procucer = SqsProcucer(url)
-    procucer.send_message(json.dumps({"messageId":str(uuid.uuid4()),"s3Key":objKey, "time":str(time.time)}))
+    procucer = SqsProcucer(sqs)
+    procucer.send_message(json.dumps({"messageId":str(messageId),"s3Key":s3Key, "time":str(time.time)}))
     print("created")
 
 def main():

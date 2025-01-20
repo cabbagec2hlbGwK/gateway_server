@@ -129,7 +129,7 @@ def extract_excel_to_csv(data):
 def sendUpdate(receiver, message):
     url = os.getenv("SENDSQSURL","")
     key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
-    envelope = createEnvelope(sender=f"dc@{receiver.split('@')[-1]}", receivers=f"{reciver}", message=f"{message}")
+    envelope = createEnvelope(sender=f"dc@{receiver.split('@')[-1]}", receivers=f"{receiver}", message=f"{message}")
     bucketName = os.getenv("S3BUCKET","testbbuckker12")
 
     s3Manager = S3Manage(key, bucketName)

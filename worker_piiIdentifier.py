@@ -73,6 +73,7 @@ def main():
             user = getUser(piiFound, args.identity_endpoint)
             print(user)
             print("-----------------")
+            print(endUsers)
             if user.get("email") == "null" and user_not_registered_default == "approve":
                 sendMessage(messaageID, s3Key, timeStamp, sendSqs)
             producer = SqsProcucer(pendinfApproval)

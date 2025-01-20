@@ -60,7 +60,7 @@ class SqsConsumer:
                             log.info(f"Deleted message: {message['MessageId']}")
 
                     except Exception as e:
-                        log.error(f"Error processing message: {e}")
+                        print(f"Error processing message: {e}")
 
         except (NoCredentialsError, PartialCredentialsError):
             print("problem in creds")

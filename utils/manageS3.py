@@ -26,6 +26,7 @@ class S3Manage:
             pickledData = pickle.dumps(data)
             return self.cipher.encrypt(pickledData)
         except Exception as e:
+            print(e)
             log.error(e)
 
     def decriptData(self, data):
@@ -34,6 +35,7 @@ class S3Manage:
             formatedData = pickle.loads(decData)
             return formatedData
         except Exception as e:
+            print(e)
             log.error(e)
 
     def s3Get(self, key):
@@ -59,7 +61,6 @@ def main():
     s3Manager = S3Manage(key, bucketName)
     key = s3Manager.s3Put(data)
     val = s3Manager.s3Get(key)
-    print(val.get("test"))
 
 
 

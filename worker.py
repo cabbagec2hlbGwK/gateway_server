@@ -126,10 +126,10 @@ def extract_excel_to_csv(data):
     csv_text = csv_buffer.getvalue()
     return csv_text
 
-def sendUpdate(reciver, message):
+def sendUpdate(receiver, message):
     url = os.getenv("SENDSQSURL","")
     key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
-    envelope = createEnvelope(sender=f"dc@{reciver.split('@')[-1]}", receivers=f"{reciver}", message=f"{message}")
+    envelope = createEnvelope(sender=f"dc@{receiver.split('@')[-1]}", receivers=f"{reciver}", message=f"{message}")
     bucketName = os.getenv("S3BUCKET","testbbuckker12")
 
     s3Manager = S3Manage(key, bucketName)
@@ -224,13 +224,13 @@ Thank you for your attention to this matter. If you need further assistance, ple
 Best regards,
 DigiControl Team
         """
-        sendUpdate(reciver=mailfrom , message=blockMessage)
+        sendUpdate(receiver=mailfrom , message=blockMessage)
         url = os.getenv("OWNERIDENTY","")
         if not url:
             raise Exception("OWNERIDENTY not found")
         producer = SqsProcucer(url)
         #TODO need the work on the encription on it 
-        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()), "endUsers":json.dumps({"sender":mailfrom, "recivers":", ".join(rcpttos)}) ,"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
+        producer.send_message(json.dumps({"messageId":str(uuid.uuid4()), "endUsers":json.dumps({"sender":mailfrom, "receivers":"".join(rcpttos)}) ,"pii":json.dumps(jres), "s3Key":objKey,"timeStamp":time.time()}))
         return 1
 
 

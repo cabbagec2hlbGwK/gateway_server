@@ -26,6 +26,7 @@ class S3Manage:
             pickledData = pickle.dumps(data)
             return self.cipher.encrypt(pickledData)
         except Exception as e:
+            print("This is the enc side")
             print(e)
             log.error(e)
 
@@ -35,6 +36,7 @@ class S3Manage:
             formatedData = pickle.loads(decData)
             return formatedData
         except Exception as e:
+            print("This is the dec side")
             print(e)
             log.error(e)
 

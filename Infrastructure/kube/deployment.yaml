@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  labels:
+    app: pii-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pii-worker
+  template:
+    metadata:
+      labels:
+        app: pii-worker
+    spec:
+      containers:
+        - name: pii-worker
+          image: worker
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: "null"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "null"
+            - name: SQSURL
+              value: "null"
+            - name: S3BUCKET
+              value: "null"
+            - name: AWS_DEFAULT_REGION
+              value: "null"
+            - name: SENDSQSURL
+              value: "null"
+
+          ports:
+            - containerPort: 80
+          
+
+

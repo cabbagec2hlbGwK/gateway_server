@@ -31,10 +31,13 @@ resource "aws_instance" "example" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update >> /tmp/logspython.txt
-              sudo apt-get install -y python3 curl git pip tee >> /tmp/logspython.txt
-              git clone https://github.com/cabbagec2hlbGwK/gateway_server | tee /tmp/logspython.txt
-              pip install -r /gateway_server/requirements.txt | tee /tmp/logspython.txt
-              python3 /gateway_server/reciver/py | tee /tmp/logspython.txt
+              sudo apt-get install -y python3 curl git pip python3-venv >> /tmp/logspython.txt
+              git clone https://github.com/cabbagec2hlbGwK/gateway_server >> /tmp/logspython.txt
+              sudo python3 -m venv /gateway_server/env 
+              echo "done working on the env ______________"
+              sudo /gateway_server/env/bin/pip install -r /gateway_server/requirements.txt >> /tmp/logspython.txt
+              echo "done working on the installed all the pip packages ______________"
+              sudo /gateway_server/env/bin/python3 /gateway_server/reciver.py >> /tmp/logspython.txt
               EOF
 
   tags = {

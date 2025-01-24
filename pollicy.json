@@ -1,0 +1,87 @@
+{
+    "pii": [
+        "email",
+        "sin",
+        "ssn",
+        "account",
+        "routing",
+        "address",
+        "phone",
+        "passport",
+        "address"
+    ],
+    "card": {
+        "types": [
+            "Diners Club Carte Blanche",
+            "Diners Club International",
+            "Maestro",
+            "Visa",
+            "American Express",
+            "Diners Club US and Canada",
+            "Discover Card",
+            "InstaPayment",
+            "JCB",
+            "Mastercard",
+            "Visa Electron",
+            "Laser"
+        ]
+    },
+    "message": {
+        "userType": {
+            "userIsRegistered": {
+                "default": "getApproval",
+                "identity": [
+                    "email",
+                    "phone"
+                ],
+                "post": "userNotification"
+            },
+            "userNotRegistered": {
+                "default": "approve",
+                "identity": "none",
+                "supportedValues":[
+                    "approve",
+                    "reject"
+                ],
+                "post": [
+                    "userCreation",
+                    "rejectEmail",
+                    "piiRegistration"
+                ]
+            }
+        },
+        "messageType": {
+            "piiIsPresent": {
+                "default": "type.default",
+                "type": [
+                    "userIsRegistered",
+                    "userNotRegistered"
+                ]
+            },
+            "piiNotPresent": {
+                "default": "Emailsend"
+            }
+        }
+    },
+    "user": {
+        "whiteList": {
+            "description": "All the emails defined here will bypass the scanning for PII.",
+            "senderList": [
+                "earth1@brokencosmos.com"
+            ],
+            "receiverList": [
+                "husky@duck.com"
+            ]
+        },
+        "blackList": {
+            "description": "All the emails defined here will be blocked by default.",
+            "senderList": [
+                "null"
+            ],
+            "receiverList": [
+                "null"
+            ]
+        }
+    }
+}
+

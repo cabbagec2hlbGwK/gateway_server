@@ -1,18 +1,22 @@
-import requests
 import logging
-import base64
 import os
 import argparse
 import ssl
 import subprocess
 import smtplib
 import json
-import pprint
+import uuid
+import signal
+import sys
+from datetime import datetime
 from aiosmtpd.smtp import SMTP
 from aiosmtpd.controller import Controller
+from email.policy import compat32
 from email import message_from_bytes
 from email.policy import default
-from email.message import EmailMessage
+from utils.manageS3 import S3Manage
+from utils.manageQueue import SqsProcucer
+
 
 
 log = logging.getLogger("reciver")
@@ -32,42 +36,54 @@ if not os.path.exists(f'cert/{os.path.sep}cert.pem') and not os.path.exists(f'ce
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 context.load_cert_chain(f'cert{os.path.sep}cert.pem', f'cert{os.path.sep}key.pem')
 
+def modifyEmailHeader(envelope):
+    tokenHeader = "X-TOKEN"
+    message = message_from_bytes(envelope.content, policy=compat32)
+
+    if tokenHeader in message:
+        log.debug(f"Original '{tokenHeader}' header: {message[tokenHeader]}")
+        message.replace_header(tokenHeader, "CHECKED")
+        log.debug(f"Modified '{tokenHeader}' header: {message[tokenHeader]}")
+    else:
+        log.debug(f"Header '{tokenHeader}' not found. Adding it.")
+        message[tokenHeader] = "CHECKED"
+    envelope.content = message.as_bytes(policy=compat32)
+    return envelope
+
+def verifyEmail(envelope):
+    dcToken = os.getenv("DC_TOKEN","NULL")
+    tokenHeader = "X-TOKEN"
+    message = message_from_bytes(envelope.content, policy=compat32)
+
+    if tokenHeader in message:
+        log.debug(f"Original '{tokenHeader}' header: {message[tokenHeader]}")
+        if dcToken in message[tokenHeader]:
+            return True
+        else:
+            return False
+    else:
+        return False
 #------------------------------------------------------------------------------
 
 class MessageHandler:
     async def handle_DATA(self, server, session, envelope):
-        peer = session.peer
+        print(f"The email is valid:{verifyEmail(envelope)}")
+        key = os.getenv("ENCKEY", "t"*32).encode('utf-8')
+        bucketName = os.getenv("S3BUCKET","testbbuckker12")
+        s3Manager = S3Manage(key, bucketName)
+
+        url = os.getenv("SQSURL","https://sqs.us-east-1.amazonaws.com/536380612665/DCEMAIL.fifo")
+        procucer = SqsProcucer(url)
+        print("created")
         mailfrom = envelope.mail_from
         rcpttos = envelope.rcpt_tos
-        message = message_from_bytes(envelope.content, policy=default)
-        data = {"message":message, "rcpttos":rcpttos,"mailfrom":mailfrom}
-        body = message.get_payload()
-        emailMess = None
-        attachments = list()
-        if not isinstance(body, str) and len(body)>1:
-            emailMess = body[0]
-            attachments = body[1:]
-        else:
-            emailMess = body
-        log.debug(f"Message: {emailMess}, Attachments: {len(attachments)}")
-        url = f"http://{args.api}:5000/detect"
-        res = requests.post(url, json={"text":str(emailMess)})
-        log.debug(res.text)
+        data = {"envelope":envelope,"mailfrom":mailfrom,"rcpttos":rcpttos}
 
-        for attachment in attachments:
-            metadata = attachment.get("Content-Type").split(";")
-            contentType = metadata[0].strip()
-            name = metadata[1].split("=")[1].replace('"','').strip()
-            files =  {'test': (name, base64.b64decode(attachment.get_payload()), contentType)}
-            url = f"http://{args.api}:5000/extract"
-            res = requests.post(url, files=files)
-            log.debug(res.text)
+        ObjectKey = s3Manager.s3Put(data)
+        queueElement = {"id":str(uuid.uuid4()),"s3Key":ObjectKey,"from":mailfrom, "rcpttos":rcpttos,"timeStamp":str(datetime.now())} 
+        procucer.send_message(json.dumps(queueElement))
 
-        with smtplib.SMTP(host='smtp-relay.gmail.com', port=587) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.send_message(message, mailfrom, rcpttos)
-            smtp.quit()
+        del s3Manager
         return '250 OK' ### ADDED RETURN
 
 # Pass SSL context to aiosmtpd
@@ -75,13 +91,26 @@ class ControllerStarttls(Controller):
     def factory(self):
         return SMTP(self.handler, require_starttls=True, tls_context=context)
 
+def signal_handler(sig, frame):
+    log.info('Received signal to stop. Stopping the server...')
+    controller.stop()
+    sys.exit(0)
 
 
 #---------------------------------runner---------------------------------------
 if __name__ == "__main__":
     controller = ControllerStarttls(MessageHandler(), port=args.port,  hostname=args.ip)
     controller.start()
-    log.info('Running STARTTLS server. Press enter to stop.')
-    input()
+    log.info('Running STARTTLS server. Press Ctrl+C to stop.')
+    signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
+    signal.signal(signal.SIGTERM, signal_handler)  # Handle termination signal
+    # Instead of input(), you can use a loop to keep the script alive
+    while True:
+        try:
+            pass
+        except Exception as e:
+            log.error(f'An error occurred: {e}')
+            break
+
     controller.stop()
     
